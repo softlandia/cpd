@@ -65,6 +65,14 @@ func FileConvertCodePage(fileName string, fromCP, toCP IDCodePage) error {
 		return nil
 	}
 
+	if (fromCP != Windows1251) && (fromCP != IBM866) {
+		return nil
+	}
+
+	if (toCP != Windows1251) && (toCP != IBM866) {
+		return nil
+	}
+
 	iFile, err := os.Open(fileName)
 	if err != nil {
 		return err

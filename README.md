@@ -29,7 +29,7 @@ IDCodePage uint16 - index of code page, support String() interface, you can fmt.
 
 1. CodePageDetect(r io.Reader, stopStr ...string) (IDCodePage, error)
 2. FileCodePageDetect(fn string, stopStr ...string) (IDCodePage, error)
-3. StrConvertCodePage(s string, fromCP, toCP uint16) (string, error)
+3. StrConvertCodePage(s string, fromCP, toCP IDCodePage) (string, error)
 4. FileConvertCodePage(fileName string, fromCP, toCP IDCodePage) error
 
 ## description ##
@@ -45,11 +45,11 @@ IDCodePage uint16 - index of code page, support String() interface, you can fmt.
     file must contain characters of the Rusian alphabet
     string stopStr now not using
 
-    func StrConvertCodePage(s string, fromCP, toCP IDCodePage) (string, error)  //convert string from one code page to another
+    func StrConvertCodePage(s string, fromCP, toCP IDCodePage) (string, error)  //convert string from one code page to another, support Windows1251 & IBM866
 
-    func FileConvertCodePage(fileName string, fromCP, toCP IDCodePage) error    //convert code page file with "fileName"
+    func FileConvertCodePage(fileName string, fromCP, toCP IDCodePage) error    //convert code page file with "fileName", support Windows1251 & IBM866
 
 ## tests ##
 
-coverage 96.2%  
+coverage: 84.0% of statements  
 folder "test_files" contain files for testing, do not remove/change/add if want support tests is work
