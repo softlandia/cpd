@@ -1,0 +1,2 @@
+﻿code page UTF8
+Русский
