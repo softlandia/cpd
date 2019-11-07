@@ -28,7 +28,7 @@ type tableElement struct {
 }
 
 //codePageTable - содержит основные (наиболее часто встречаемые) символы алфавита в данной кодировке
-//первые 8 прописные, 2-я восьмёрка заглавные
+//первые 9 прописные, 2-я девятка заглавные
 type codePageTable [19]tableElement
 
 //MatchRes - итоговый критерий совпадения массива данных с кодовой страницей
@@ -41,8 +41,8 @@ type CodePage struct {
 	id       IDCodePage    //id of code page
 	name     string        //name of code page
 	MatchRes               //count of matching
-	match    runesMatch    //calculate from input data count of entry to codepage
-	table    codePageTable //table of main alfabet rune of this code page, use for calculate frequency
+	match    runesMatch    //method to calculate from input data count of entry to codepage
+	table    codePageTable //table of main alphabet rune of this code page, contain [code, count]
 }
 
 func (o CodePage) String() string {
