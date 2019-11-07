@@ -2,7 +2,16 @@
 
 (c) softlandia@gmail.com
 
-golang 
+golang library for detecting code page of text files  
+support russian code page:
+
+1. ASCII - default value
+2. Windows1251
+3. IBM866
+4. KOI8R
+5. UTF16LE only with bom
+6. UTF16BE only with bom
+7. UTF8
 
 >download: go get -u github.com/softlandia/cpd  
 >install: go install
@@ -12,29 +21,35 @@ golang
 >"golang.org/x/text/encoding/charmap"  
 >"golang.org/x/text/transform"
 
+## types ##
+
+IDCodePage uint16 - index of code page, support String() interface, you can fmt.Printf("code page index, name: %d, %s\n", cp, cp) where var cp received from cpd functions
+
 ## functions ##
 
-1. StrConvertCodePage(s string, fromCP, toCP uint16) (string, error)
-2. FileConvertCodePage(fileName string, fromCP, toCP uint16) error
-3. FindFilesExt(fileList *[]string, path, fileNameExt string) (int, error)
-4. CodePageDetect(fn string) (int, error)
+1. CodePageDetect(r io.Reader, stopStr ...string) (IDCodePage, error)
+2. FileCodePageDetect(fn string, stopStr ...string) (IDCodePage, error)
+3. StrConvertCodePage(s string, fromCP, toCP uint16) (string, error)
+4. FileConvertCodePage(fileName string, fromCP, toCP IDCodePage) error
 
 ## description ##
 
+    CodePageDetect(r io.Reader, stopStr ...string) (IDCodePage, error)
+    detect code page of ascii data from reader 'r' 
 
-    func StrConvertCodePage(s string, fromCP, toCP int64) (string, error)  //convert string from one code page to another
+    FileCodePageDetect(fn string, stopStr ...string) (IDCodePage, error)
+    detect code page of text file "fn", read first 1024 byte (var ReadBufSize to change this setting)
+    return error if problem with file "fn"
+    return cpd.ASCII if code page not detected
+    return one of next constant (code_pages_id.go): cpd.IBM866, cpd.Windows1251, cpd.KOI8R, cpd.UTF8, UTF16LE, UTF16BE
+    file must contain characters of the Rusian alphabet
+    string stopStr now not using
 
-    func FileConvertCodePage(fileName string, fromCP, toCP int64) error //convert code page test file
+    func StrConvertCodePage(s string, fromCP, toCP IDCodePage) (string, error)  //convert string from one code page to another
 
-    func FindFilesExt(fileList *[]string, path, fileNameExt string) (int, error)  //search in path files with extention == fileNameExt and put file name to slice fileList
-
-    func CodePageDetect(fn string, stopStr ...string) (int, error)  
-    detect code page of text file "fn", 
-    detect only IBM CodePage866 and Windows1251  
-    return constant cpd.CpIBM866, cpd.CpWindows1251, cpd.CpASCII
-    if string stopStr is present then input file scanned befor appearance stopStr
+    func FileConvertCodePage(fileName string, fromCP, toCP IDCodePage) error    //convert code page file with "fileName"
 
 ## tests ##
 
 coverage 96.2%  
-folder "test_files" contain files for testing, no remove/change/add
+folder "test_files" contain files for testing, do not remove/change/add if want support tests is work

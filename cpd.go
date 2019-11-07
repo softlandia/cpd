@@ -15,6 +15,9 @@ import (
 	"golang.org/x/text/transform"
 )
 
+//ReadBufSize - byte count for reading from file, func FileCodePageDetect()
+var ReadBufSize int = 1024
+
 //CodePageAutoDetect - auto detect code page of input content
 func CodePageAutoDetect(content []byte) (result IDCodePage) {
 	return CodePages.Match(content)
@@ -29,7 +32,7 @@ func CodePageDetect(r io.Reader, stopStr ...string) (IDCodePage, error) {
 	}
 
 	//make slice of byte from input reader
-	buf, err := bufio.NewReader(r).Peek(1024)
+	buf, err := bufio.NewReader(r).Peek(ReadBufSize)
 	if (err != nil) && (err.Error() != "EOF") {
 		return ASCII, err
 	}
