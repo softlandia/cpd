@@ -109,15 +109,28 @@ var CodePages = TCodePages{
 			{0xC0, 0}, {0xC8, 0}, {0xCD, 0}, {0xD1, 0}, {0xD0, 0}, {0xC2, 0}, {0xCB, 0}, {0xCA, 0}, {0xC2, 0}}},
 	{KOI8R, "KOI8R", MatchRes{0}, runesMatchKOI8,
 		codePageTable{
-			//о		    а		   и		  т			 с			в		   л		  к			в
+			//о		    а		   и		  т			 с			в		   л		  к			в //TODO м вместо второй в
 			{0, 0},
 			{0xCF, 0}, {0xC1, 0}, {0xC9, 0}, {0xD4, 0}, {0xD3, 0}, {0xD7, 0}, {0xCC, 0}, {0xCB, 0}, {0xD7, 0},
 			{0xEF, 0}, {0xE1, 0}, {0xE9, 0}, {0xF4, 0}, {0xF3, 0}, {0xF7, 0}, {0xEC, 0}, {0xEB, 0}, {0xF7, 0}}},
+	{ISOLatinCyrillic, "ISO-8859-5", MatchRes{0}, runesMatchISO88595,
+		codePageTable{
+			//о		    а		   и		  т			 с			в		   л		  к			е
+			{0, 0},
+			{0xDE, 0}, {0xD0, 0}, {0xD8, 0}, {0xE2, 0}, {0xE1, 0}, {0xD2, 0}, {0xDB, 0}, {0xDA, 0}, {0xD5, 0},
+			{0xBF, 0}, {0xB0, 0}, {0xB8, 0}, {0xC2, 0}, {0xC1, 0}, {0xB2, 0}, {0xBB, 0}, {0xBA, 0}, {0xB5, 0}}},
+	{UTF16LE, "UTF16LE", MatchRes{0}, runesMatchUTF16LE,
+		codePageTable{
+			{0, 0},
+			//о           е				а		    и			 н			  т			   с			р			в
+			{0x3E04, 0}, {0x3504, 0}, {0x1004, 0}, {0x3804, 0}, {0x3D04, 0}, {0x4204, 0}, {0x4104, 0}, {0x4004, 0}, {0x3204, 0},
+			{0x1E04, 0}, {0x1504, 0}, {0x3004, 0}, {0x1804, 0}, {0x1D04, 0}, {0x2204, 0}, {0x2104, 0}, {0x2004, 0}, {0x1204, 0}}},
 }
 
 //codePageName - string of code page name
 var codePageName = map[IDCodePage]string{
 	ASCII:              "ASCII",
+	ISOLatinCyrillic:   "ISO-8859-5",
 	IBM866:             "IBM866",
 	Windows1251:        "Windows1251",
 	UTF8:               "UTF8",

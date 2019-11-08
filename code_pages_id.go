@@ -6,6 +6,13 @@ const (
 	// Reference: RFC2046
 	ASCII IDCodePage = 3
 
+	// ISOLatinCyrillic is the MIB identifier with IANA name ISO_8859-5:1988 (MIME: ISO-8859-5).
+	//
+	// ISO-IR: International Register of Escape Sequences
+	// Note: The current registration authority is IPSJ/ITSCJ, Japan.
+	// Reference: RFC1345
+	ISOLatinCyrillic IDCodePage = 8
+
 	// ISO5427Cyrillic is the uint16 identifier with IANA name ISO_5427.
 	// ISO-IR: International Register of Escape Sequences
 	// Note: The current registration authority is IPSJ/ITSCJ, Japan.

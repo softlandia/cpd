@@ -85,10 +85,11 @@ type tFileCodePageDetectTest struct {
 }
 
 var dFileCodePageDetect = []tFileCodePageDetectTest{
-	{"test_files\\utf16BEwbom.txt", "", nil, UTF16BE}, //file contain utf16 big endian with bom rune at start
-	//{"test_files\\utf16be-woBOM.txt", "", nil, UTF16BE},       //file contain utf16 big endian with out bom rune at start
-	{"test_files\\utf16le-wBOM.txt", "", nil, UTF16LE}, //file contain utf16 liitle endian with bom rune at start
-	//{"test_files\\utf16le-woBOM.txt", "", nil, UTF16LE},       //file contain utf16 liitle endian with out bom rune at start
+	{"test_files\\KOI8-r.txt", "", nil, KOI8R},                //file contain KOI8
+	{"test_files\\IBM866.txt", "", nil, IBM866},               //file contain IBM866
+	{"test_files\\Win1251.txt", "", nil, Windows1251},         //file contain Windows1251
+	{"test_files\\utf16BEwbom.txt", "", nil, UTF16BE},         //file contain utf16 big endian with bom rune at start
+	{"test_files\\utf16le-wBOM.txt", "", nil, UTF16LE},        //file contain utf16 liitle endian with bom rune at start
 	{"test_files\\utf8-woBOM.txt", "", nil, UTF8},             //file contain utf8 with out bom rune at start
 	{"test_files\\866&1251.txt", "~X~", nil, Windows1251},     //befor ~X~ file contain 866, after 1251
 	{"test_files\\866&1251.txt", "", nil, Windows1251},        //file contain more 1251 then 866
@@ -98,6 +99,8 @@ var dFileCodePageDetect = []tFileCodePageDetectTest{
 	{"test_files\\rune_error_1251.txt", "", nil, Windows1251}, //file contain 1251 and special rune -> encode error, but detect NO error
 	{"test_files\\utf8wbom.txt", "", nil, UTF8},               //file contain utf8 with bom rune at start
 	{"test_files\\utf16LEwbom.txt", "", nil, UTF16LE},         //file contain utf16 little endian with bom rune at start
+	{"test_files\\utf16le-woBOM.txt", "", nil, UTF16LE},       //file contain utf16 liitle endian with out bom rune at start
+	//{"test_files\\utf16be-woBOM.txt", "", nil, UTF16BE},       //file contain utf16 big endian with out bom rune at start
 }
 
 //FileCodePageDetect
