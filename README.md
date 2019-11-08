@@ -36,15 +36,15 @@ IDCodePage uint16 - index of code page, support String() interface, you can fmt.
 ## description ##
 
     CodePageDetect(r io.Reader, stopStr ...string) (IDCodePage, error)
-    detect code page of ascii data from reader 'r' 
+      detect code page of ascii data from reader 'r' 
 
     FileCodePageDetect(fn string, stopStr ...string) (IDCodePage, error)
-    detect code page of text file "fn", read first 1024 byte (var ReadBufSize to change this setting)
-    return error if problem with file "fn"
-    return cpd.ASCII if code page not detected
-    return one of next constant (code_pages_id.go): cpd.IBM866, cpd.Windows1251, cpd.KOI8R, cpd.UTF8, UTF16LE, UTF16BE
-    file must contain characters of the Rusian alphabet
-    string stopStr now not using
+      detect code page of text file "fn", read first 1024 byte (var ReadBufSize to change this setting)
+      return error if problem with file "fn"
+      return cpd.ASCII if code page not detected
+      return one of next constant (code_pages_id.go): cpd.IBM866, cpd.Windows1251, cpd.KOI8R, cpd.UTF8, UTF16LE, UTF16BE
+      file must contain characters of the Rusian alphabet
+      string stopStr now not using
 
     func StrConvertCodePage(s string, fromCP, toCP IDCodePage) (string, error)  //convert string from one code page to another, support Windows1251 & IBM866
 
