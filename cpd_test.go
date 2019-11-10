@@ -93,14 +93,14 @@ var dFileCodePageDetect = []tFileCodePageDetectTest{
 	{"test_files\\utf8-woBOM.txt", "", nil, UTF8},             //file contain utf8 with out bom rune at start
 	{"test_files\\866&1251.txt", "~X~", nil, Windows1251},     //befor ~X~ file contain 866, after 1251
 	{"test_files\\866&1251.txt", "", nil, Windows1251},        //file contain more 1251 then 866
-	{"test_files\\noCodePage.txt", "", nil, ASCII},            //file contain rune only ASCII
-	{"test_files\\empty_file.txt", "", nil, ASCII},            //file exist but empty, no error, return ASCII
+	{"test_files\\noCodePage.txt", "", nil, UTF8},             //file contain rune only ASCII
+	{"test_files\\empty_file.txt", "", nil, UTF8},             //file exist but empty, no error, return ASCII
 	{"test_files\\rune_encode_error.txt", "", nil, ASCII},     //file contain special rune -> encode error, but detect NO error
 	{"test_files\\rune_error_1251.txt", "", nil, Windows1251}, //file contain 1251 and special rune -> encode error, but detect NO error
 	{"test_files\\utf8wbom.txt", "", nil, UTF8},               //file contain utf8 with bom rune at start
 	{"test_files\\utf16LEwbom.txt", "", nil, UTF16LE},         //file contain utf16 little endian with bom rune at start
 	{"test_files\\utf16le-woBOM.txt", "", nil, UTF16LE},       //file contain utf16 liitle endian with out bom rune at start
-	//{"test_files\\utf16be-woBOM.txt", "", nil, UTF16BE},       //file contain utf16 big endian with out bom rune at start
+	{"test_files\\utf16be-woBOM.txt", "", nil, UTF16BE},       //file contain utf16 big endian with out bom rune at start
 }
 
 //FileCodePageDetect

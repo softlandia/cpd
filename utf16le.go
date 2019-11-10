@@ -19,7 +19,6 @@ func runesMatchUTF16LE(data []byte, tbl *codePageTable) (counts int) {
 		j := tbl.containsRune(rune(d))
 		if j > 0 {
 			(*tbl)[j].count++
-			//counts++
 		}
 		if isUTF16LE(rune(d)) {
 			counts++

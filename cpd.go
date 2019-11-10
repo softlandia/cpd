@@ -38,9 +38,15 @@ func CodePageDetect(r io.Reader, stopStr ...string) (IDCodePage, error) {
 	}
 
 	//check file header // utf-8, utf-16 with BOM
-	if idHeader, ok := checkHeader(buf); ok {
-		return idHeader, nil
+	if idCodePage, ok := checkHeader(buf); ok {
+		return idCodePage, nil
 	}
+
+	//check data for UTF
+	if IsUtf8(buf) {
+		return UTF8, nil
+	}
+
 	return CodePageAutoDetect(buf), nil
 }
 

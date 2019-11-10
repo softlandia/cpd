@@ -109,10 +109,10 @@ var CodePages = TCodePages{
 			{0xC0, 0}, {0xC8, 0}, {0xCD, 0}, {0xD1, 0}, {0xD0, 0}, {0xC2, 0}, {0xCB, 0}, {0xCA, 0}, {0xC2, 0}}},
 	{KOI8R, "KOI8R", MatchRes{0}, runesMatchKOI8,
 		codePageTable{
-			//о		    а		   и		  т			 с			в		   л		  к			в //TODO м вместо второй в
+			//о		    а		   и		  т			 с			в		   л		  к			м
 			{0, 0},
-			{0xCF, 0}, {0xC1, 0}, {0xC9, 0}, {0xD4, 0}, {0xD3, 0}, {0xD7, 0}, {0xCC, 0}, {0xCB, 0}, {0xD7, 0},
-			{0xEF, 0}, {0xE1, 0}, {0xE9, 0}, {0xF4, 0}, {0xF3, 0}, {0xF7, 0}, {0xEC, 0}, {0xEB, 0}, {0xF7, 0}}},
+			{0xCF, 0}, {0xC1, 0}, {0xC9, 0}, {0xD4, 0}, {0xD3, 0}, {0xD7, 0}, {0xCC, 0}, {0xCB, 0}, {0xCD, 0},
+			{0xEF, 0}, {0xE1, 0}, {0xE9, 0}, {0xF4, 0}, {0xF3, 0}, {0xF7, 0}, {0xEC, 0}, {0xEB, 0}, {0xED, 0}}},
 	{ISOLatinCyrillic, "ISO-8859-5", MatchRes{0}, runesMatchISO88595,
 		codePageTable{
 			//о		    а		   и		  т			 с			в		   л		  к			е
@@ -125,23 +125,24 @@ var CodePages = TCodePages{
 			//о           е				а		    и			 н			  т			   с			р			в
 			{0x3E04, 0}, {0x3504, 0}, {0x1004, 0}, {0x3804, 0}, {0x3D04, 0}, {0x4204, 0}, {0x4104, 0}, {0x4004, 0}, {0x3204, 0},
 			{0x1E04, 0}, {0x1504, 0}, {0x3004, 0}, {0x1804, 0}, {0x1D04, 0}, {0x2204, 0}, {0x2104, 0}, {0x2004, 0}, {0x1204, 0}}},
+	{UTF16BE, "UTF16BE", MatchRes{0}, runesMatchUTF16BE,
+		codePageTable{
+			{0, 0},
+			//о           е				а		    и			 н			  т			   с			р			в
+			{0x043E, 0}, {0x0435, 0}, {0x0410, 0}, {0x0438, 0}, {0x043D, 0}, {0x0442, 0}, {0x0441, 0}, {0x0440, 0}, {0x0432, 0},
+			{0x041E, 0}, {0x0415, 0}, {0x0430, 0}, {0x0418, 0}, {0x041D, 0}, {0x0422, 0}, {0x0421, 0}, {0x0420, 0}, {0x0412, 0}}},
 }
 
 //codePageName - string of code page name
 var codePageName = map[IDCodePage]string{
-	ASCII:              "ASCII",
-	ISOLatinCyrillic:   "ISO-8859-5",
-	IBM866:             "IBM866",
-	Windows1251:        "Windows1251",
-	UTF8:               "UTF8",
-	UTF16:              "UTF16",
-	UTF16LE:            "UTF16LE",
-	UTF16BE:            "UTF16BE",
-	UTF32:              "UTF32",
-	KOI8R:              "KOI8R",
-	ISO5427Cyrillic:    "ISO5427Cyrillic",
-	ISO51INISCyrillic:  "ISO51INISCyrillic",
-	ISO111ECMACyrillic: "ISO111ECMACyrillic",
-	ISO153GOST1976874:  "ISO153GOST1976874",
-	Unicode:            "Unicode",
+	ASCII:            "ASCII",
+	ISOLatinCyrillic: "ISO-8859-5",
+	IBM866:           "IBM866",
+	Windows1251:      "Windows1251",
+	UTF8:             "UTF8",
+	UTF16LE:          "UTF16LE",
+	UTF16BE:          "UTF16BE",
+	UTF32:            "UTF32",
+	KOI8R:            "KOI8R",
+	Unicode:          "Unicode",
 }

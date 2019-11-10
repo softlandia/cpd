@@ -13,29 +13,6 @@ const (
 	// Reference: RFC1345
 	ISOLatinCyrillic IDCodePage = 8
 
-	// ISO5427Cyrillic is the uint16 identifier with IANA name ISO_5427.
-	// ISO-IR: International Register of Escape Sequences
-	// Note: The current registration authority is IPSJ/ITSCJ, Japan.
-	// Reference: RFC1345
-	ISO5427Cyrillic IDCodePage = 48
-
-	// ISO51INISCyrillic is the uint16 identifier with IANA name INIS-cyrillic.
-	// ISO-IR: International Register of Escape Sequences
-	// Note: The current registration authority is IPSJ/ITSCJ, Japan.
-	// Reference: RFC1345
-	ISO51INISCyrillic IDCodePage = 53
-
-	// ISO111ECMACyrillic is the uint16 identifier with IANA name ECMA-cyrillic.
-	// ISO registry
-	// (formerly ECMA registry )
-	ISO111ECMACyrillic IDCodePage = 77
-
-	// ISO153GOST1976874 is the uint16 identifier with IANA name GOST_19768-74.
-	// ISO-IR: International Register of Escape Sequences
-	// Note: The current registration authority is IPSJ/ITSCJ, Japan.
-	// Reference: RFC1345
-	ISO153GOST1976874 IDCodePage = 94
-
 	// UTF8 is the uint16 identifier with IANA name UTF-8.
 	//
 	// rfc3629
@@ -72,12 +49,6 @@ const (
 	// rfc2781
 	// Reference: RFC2781
 	UTF16LE IDCodePage = 1014
-
-	// UTF16 is the uint16 identifier with IANA name UTF-16.
-	//
-	// rfc2781
-	// Reference: RFC2781
-	UTF16 IDCodePage = 1015
 
 	// UTF32 is the uint16 identifier with IANA name UTF-32.
 	//

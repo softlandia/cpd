@@ -10,7 +10,7 @@ support russian code page:
 3. IBM866
 4. KOI8R
 5. UTF16LE
-6. UTF16BE only with bom
+6. UTF16BE
 7. UTF8
 8. ISO8859-5
 
