@@ -2,6 +2,9 @@
 
 (c) softlandia@gmail.com
 
+>download: go get -u github.com/softlandia/cpd  
+>install: go install
+
 golang library for detecting code page of text files  
 support russian code page:
 
@@ -19,9 +22,6 @@ if file contain only latin symbols, this file detected as UTF-8
 this is not a mistake, this is a completely correct statement
 
 on go vertion 1.12.6 add to exe 240 kB
-
->download: go get -u github.com/softlandia/cpd  
->install: go install
 
 ## dependences ##
 
