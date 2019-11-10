@@ -9,10 +9,16 @@ support russian code page:
 2. Windows1251
 3. IBM866
 4. KOI8R
-5. UTF16LE
-6. UTF16BE
-7. UTF8
+5. UTF-16le
+6. UTF-16le
+7. UTF-8
 8. ISO8859-5
+
+### feature ###
+if file contain only latin symbols, this file detected as UTF-8  
+this is not a mistake, this is a completely correct statement
+
+on go vertion 1.12.6 add to exe 240 kB
 
 >download: go get -u github.com/softlandia/cpd  
 >install: go install
