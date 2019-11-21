@@ -17,7 +17,8 @@ support russian code page:
 7. UTF-8
 8. ISO8859-5
 
-### feature ###
+## feature ##
+
 if file contain only latin symbols, this file detected as UTF-8  
 this is not a mistake, this is a completely correct statement
 
@@ -32,6 +33,10 @@ on go vertion 1.12.6 add to exe 240 kB
 
 IDCodePage uint16 - index of code page, support String() interface, you can fmt.Printf("code page index, name: %d, %s\n", cp, cp) where var cp received from cpd functions
 
+## variables ##
+
+ReadBufSize int = 1024 // count of byte to read from input reader by default
+
 ## functions ##
 
 1. CodePageDetect(r io.Reader, stopStr ...string) (IDCodePage, error)
@@ -43,6 +48,9 @@ IDCodePage uint16 - index of code page, support String() interface, you can fmt.
 
     CodePageDetect(r io.Reader, stopStr ...string) (IDCodePage, error)
       detect code page of ascii data from reader 'r' 
+      use library 'reflect' to check input reader
+      default read only first 1024 byte from 'r' (var ReadBufSize to change this setting)
+      input parameter stopStr not using
 
     FileCodePageDetect(fn string, stopStr ...string) (IDCodePage, error)
       detect code page of text file "fn", read first 1024 byte (var ReadBufSize to change this setting)

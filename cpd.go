@@ -1,7 +1,5 @@
 //Package cpd - code page detect
 // (c) 2019 softlandia@gmail.com
-// v0.1.0
-// 01/oct/2019
 package cpd
 
 import (
@@ -18,9 +16,19 @@ import (
 //ReadBufSize - byte count for reading from file, func FileCodePageDetect()
 var ReadBufSize int = 1024
 
-//CodePageAutoDetect - auto detect code page of input content
-func CodePageAutoDetect(content []byte) (result IDCodePage) {
-	return CodePages.Match(content)
+//FileCodePageDetect - detect code page of text file
+func FileCodePageDetect(fn string, stopStr ...string) (IDCodePage, error) {
+
+	iFile, err := os.Open(fn)
+	if err != nil {
+		return ASCII, err
+	}
+	defer iFile.Close()
+
+	if len(stopStr) > 0 {
+		return CodePageDetect(iFile, stopStr[0])
+	}
+	return CodePageDetect(iFile)
 }
 
 //CodePageDetect - detect code page of ascii data from reader 'r'
@@ -37,45 +45,35 @@ func CodePageDetect(r io.Reader, stopStr ...string) (IDCodePage, error) {
 		return ASCII, err
 	}
 
-	//check file header // utf-8, utf-16 with BOM
-	if idCodePage, ok := checkHeader(buf); ok {
+	//is buf contains the BOM of utf-8, utf-16le or utf-16be
+	if idCodePage, ok := CheckBOM(buf); ok {
 		return idCodePage, nil
 	}
 
-	//check data for UTF
-	if IsUtf8(buf) {
+	if ValidUTF8(buf) {
 		return UTF8, nil
 	}
 
 	return CodePageAutoDetect(buf), nil
 }
 
-//FileCodePageDetect - detect code page of text file
-func FileCodePageDetect(fn string, stopStr ...string) (IDCodePage, error) {
-
-	iFile, err := os.Open(fn)
-	if err != nil {
-		return ASCII, err
-	}
-	defer iFile.Close()
-
-	if len(stopStr) > 0 {
-		return CodePageDetect(iFile, stopStr[0])
-	}
-	return CodePageDetect(iFile)
+//CodePageAutoDetect - auto detect code page of input content
+func CodePageAutoDetect(content []byte) (result IDCodePage) {
+	return CodepageDic.Match(content) //TODO большинству матчеров требуется более 2х символов, надо проверить на минимальную длину
 }
 
 //FileConvertCodePage - replace code page text file from one to another
+// support convert only from/to Windows1251/IBM866
 func FileConvertCodePage(fileName string, fromCP, toCP IDCodePage) error {
 	if fromCP == toCP {
 		return nil
 	}
 
-	if (fromCP != Windows1251) && (fromCP != IBM866) {
+	if (fromCP != Windows1251) && (fromCP != CP866) {
 		return nil
 	}
 
-	if (toCP != Windows1251) && (toCP != IBM866) {
+	if (toCP != Windows1251) && (toCP != CP866) {
 		return nil
 	}
 
@@ -101,7 +99,7 @@ func FileConvertCodePage(fileName string, fromCP, toCP IDCodePage) error {
 		if err != nil {
 			oFile.Close()
 			os.Remove(tmpFileName)
-			return fmt.Errorf("cde page convert error on file '%s': %v", fileName, err)
+			return fmt.Errorf("code page convert error on file '%s': %v", fileName, err)
 		}
 		fmt.Fprintf(oFile, "%s\n", s)
 	}
@@ -110,7 +108,14 @@ func FileConvertCodePage(fileName string, fromCP, toCP IDCodePage) error {
 	return os.Rename(tmpFileName, fileName)
 }
 
+//ToUTF8 -
+//TODO need realization
+func ToUTF8(s string) string {
+	return s
+}
+
 //StrConvertCodePage - convert string from one code page to another
+// function for future, at now support convert only from/to Windows1251/IBM866
 func StrConvertCodePage(s string, fromCP, toCP IDCodePage) (string, error) {
 	if len(s) == 0 {
 		return "", nil
@@ -122,13 +127,13 @@ func StrConvertCodePage(s string, fromCP, toCP IDCodePage) (string, error) {
 	var err error
 
 	switch fromCP {
-	case IBM866:
+	case CP866:
 		s, _, err = transform.String(charmap.CodePage866.NewDecoder(), s)
 	case Windows1251:
 		s, _, err = transform.String(charmap.Windows1251.NewDecoder(), s)
 	}
 	switch toCP {
-	case IBM866:
+	case CP866:
 		s, _, err = transform.String(charmap.CodePage866.NewEncoder(), s)
 	case Windows1251:
 		s, _, err = transform.String(charmap.Windows1251.NewEncoder(), s)

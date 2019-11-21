@@ -51,8 +51,8 @@ func testUTF8bitPattern(b byte) (int, cp int32) {
 	return 0, 0
 }
 
-//IsUtf8 - return true if imput slice contain true UTF-8
-func IsUtf8(data []byte) bool {
+//ValidUTF8 - return true if imput slice contain true UTF-8
+func ValidUTF8(data []byte) bool {
 	m := len(data)
 	if m <= 1 {
 		return true

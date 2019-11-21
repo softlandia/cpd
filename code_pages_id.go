@@ -72,10 +72,10 @@ const (
 	// Reference: RFC1489
 	KOI8R IDCodePage = 2084
 
-	// IBM866 is the uint16 identifier with IANA name IBM866.
+	// CP866 is the uint16 identifier with IANA name IBM866.
 	//
 	// IBM NLDG Volume 2 (SE09-8002-03) August 1994
-	IBM866 IDCodePage = 2086
+	CP866 IDCodePage = 2086
 
 	// Windows1251 is the uint16 identifier with IANA name windows-1251.
 	//

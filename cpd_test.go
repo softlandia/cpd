@@ -13,8 +13,8 @@ type tCodePageAsString struct {
 var dCodePageAsString = []tCodePageAsString{
 	{0, ""},
 	{3, "ASCII"},
-	{IBM866, "IBM866"},
-	{Windows1251, "Windows1251"},
+	{CP866, "CP866"},
+	{Windows1251, "Windows-1251"},
 	{60000, ""},
 }
 
@@ -25,6 +25,61 @@ func TestCodePageAsString(t *testing.T) {
 			t.Errorf("<CodePageAsString> on test: %d return: %s, expected: %s", i, s, v.s)
 		}
 	}
+}
+
+type tFileCodePageDetectTest struct {
+	fn string     //filename
+	st string     //stop string
+	e  error      //
+	r  IDCodePage //expected result
+}
+
+var dFileCodePageDetect = []tFileCodePageDetectTest{
+	{"test_files\\utf32le-wBOM.txt", "", nil, UTF32LE},        //file contain utf32 little endian with bom
+	{"test_files\\KOI8-r.txt", "", nil, KOI8R},                //file contain KOI8
+	{"test_files\\IBM866.txt", "", nil, CP866},                //file contain IBM866
+	{"test_files\\Win1251.txt", "", nil, Windows1251},         //file contain Windows1251
+	{"test_files\\utf8-woBOM.txt", "", nil, UTF8},             //file contain utf8 with out bom rune at start
+	{"test_files\\866&1251.txt", "", nil, Windows1251},        //file contain more 1251 then 866
+	{"test_files\\noCodePage.txt", "", nil, UTF8},             //file contain rune only ASCII
+	{"test_files\\empty_file.txt", "", nil, UTF8},             //file exist but empty, no error, return ASCII
+	{"test_files\\rune_encode_error.txt", "", nil, ASCII},     //file contain special rune -> encode error, but detect NO error
+	{"test_files\\rune_error_1251.txt", "", nil, Windows1251}, //file contain 1251 and special rune -> encode error, but detect NO error
+	{"test_files\\utf8wbom.txt", "", nil, UTF8},               //file contain utf8 with bom prefix
+	{"test_files\\utf16LEwbom.txt", "", nil, UTF16LE},         //file contain utf16 little endian with BOM
+	{"test_files\\utf16BEwbom.txt", "", nil, UTF16BE},         //file contain utf16 big endian with BOM
+	{"test_files\\utf16le-wBOM.txt", "", nil, UTF16LE},        //file contain utf16 little endian with bom
+	{"test_files\\utf16le-woBOM.txt", "", nil, UTF16LE},       //file contain utf16 little endian without bom
+	{"test_files\\utf16be-woBOM.txt", "", nil, UTF16BE},       //file contain utf16 big endian without bom
+	{"test_files\\utf32be-wBOM.txt", "", nil, UTF32BE},        //file contain utf32 big endian with bom
+}
+
+//FileCodePageDetect
+func TestFileCodePageDetect(t *testing.T) {
+	var (
+		err error
+		res IDCodePage
+	)
+	for _, d := range dFileCodePageDetect {
+		res, err = FileCodePageDetect(d.fn)
+		if err != d.e {
+			t.Errorf("<FileCodePageDetect> on file '%s' expected error:  '%v', got: '%v', ", d.fn, d.e, err)
+		}
+		if res != d.r {
+			t.Errorf("<FileCodePageDetect> on file '%s' expected result: %s, got: %s", d.fn, d.r, res)
+		}
+	}
+
+	_, err = FileCodePageDetect("-.-") //file "-.-" not exist
+	if err == nil {
+		t.Errorf("<FileCodePageDetect> on file '-.-' must return error, but return nil")
+	}
+
+	_, err = FileCodePageDetect("") //file "" not exist
+	if err == nil {
+		t.Errorf("<FileCodePageDetect> on file '' must return error, but return nil")
+	}
+
 }
 
 //TestCodePageDetect - тестирование метода CodePageDetect
@@ -55,8 +110,8 @@ func TestFileCodePageDetectSimple(t *testing.T) {
 	if err != nil {
 		t.Errorf("<FileCodePageDetect()> on file '866to1251.txt' err expected: nil, got: %s\n", err)
 	}
-	if res != IBM866 {
-		t.Errorf("<FileCodePageDetect()> on file '866to1251.txt' expected: %s, got: %s\n", IBM866, res)
+	if res != CP866 {
+		t.Errorf("<FileCodePageDetect()> on file '866to1251.txt' expected: %s, got: %s\n", CP866, res)
 	}
 	res, err = FileCodePageDetect("test_files\\866&1251.txt")
 	if err != nil {
@@ -77,93 +132,35 @@ func TestFileCodePageDetectUtf8Bom(t *testing.T) {
 	}
 }
 
-type tFileCodePageDetectTest struct {
-	fn string     //filename
-	st string     //stop string
-	e  error      //
-	r  IDCodePage //expected result
-}
-
-var dFileCodePageDetect = []tFileCodePageDetectTest{
-	{"test_files\\KOI8-r.txt", "", nil, KOI8R},                //file contain KOI8
-	{"test_files\\IBM866.txt", "", nil, IBM866},               //file contain IBM866
-	{"test_files\\Win1251.txt", "", nil, Windows1251},         //file contain Windows1251
-	{"test_files\\utf16BEwbom.txt", "", nil, UTF16BE},         //file contain utf16 big endian with bom rune at start
-	{"test_files\\utf16le-wBOM.txt", "", nil, UTF16LE},        //file contain utf16 liitle endian with bom rune at start
-	{"test_files\\utf8-woBOM.txt", "", nil, UTF8},             //file contain utf8 with out bom rune at start
-	{"test_files\\866&1251.txt", "~X~", nil, Windows1251},     //befor ~X~ file contain 866, after 1251
-	{"test_files\\866&1251.txt", "", nil, Windows1251},        //file contain more 1251 then 866
-	{"test_files\\noCodePage.txt", "", nil, UTF8},             //file contain rune only ASCII
-	{"test_files\\empty_file.txt", "", nil, UTF8},             //file exist but empty, no error, return ASCII
-	{"test_files\\rune_encode_error.txt", "", nil, ASCII},     //file contain special rune -> encode error, but detect NO error
-	{"test_files\\rune_error_1251.txt", "", nil, Windows1251}, //file contain 1251 and special rune -> encode error, but detect NO error
-	{"test_files\\utf8wbom.txt", "", nil, UTF8},               //file contain utf8 with bom rune at start
-	{"test_files\\utf16LEwbom.txt", "", nil, UTF16LE},         //file contain utf16 little endian with bom rune at start
-	{"test_files\\utf16le-woBOM.txt", "", nil, UTF16LE},       //file contain utf16 liitle endian with out bom rune at start
-	{"test_files\\utf16be-woBOM.txt", "", nil, UTF16BE},       //file contain utf16 big endian with out bom rune at start
-}
-
-//FileCodePageDetect
-func TestFileCodePageDetect(t *testing.T) {
-	var (
-		err error
-		res IDCodePage
-	)
-	for _, d := range dFileCodePageDetect {
-		if len(d.st) == 0 {
-			res, err = FileCodePageDetect(d.fn)
-		} else {
-			res, err = FileCodePageDetect(d.fn, d.st)
-		}
-		if err != d.e {
-			t.Errorf("<FileCodePageDetect> on file '%s' expected error:  '%v', got: '%v', ", d.fn, d.e, err)
-		}
-		if res != d.r {
-			t.Errorf("<FileCodePageDetect> on file '%s' expected result: %s, got: %s", d.fn, d.r, res)
-		}
-	}
-
-	_, err = FileCodePageDetect("-.-") //file "-.-" not exist
-	if err == nil {
-		t.Errorf("<FileCodePageDetect> on file '-.-' must return error, but return nil")
-	}
-
-	_, err = FileCodePageDetect("") //file "" not exist
-	if err == nil {
-		t.Errorf("<FileCodePageDetect> on file '' must return error, but return nil")
-	}
-
-}
-
 //FileConvertCodePage
 func TestFileConvertCodePage(t *testing.T) {
-	err := FileConvertCodePage("", IBM866, Windows1251)
+	err := FileConvertCodePage("", CP866, Windows1251)
 	if err == nil {
 		t.Errorf("<FileConvertCodePage> on empty file name expected error, got: %v", err)
 	}
 
-	err = FileConvertCodePage("", IBM866, IBM866)
+	err = FileConvertCodePage("", CP866, CP866)
 	if err != nil {
 		t.Errorf("<FileConvertCodePage> on fromCp == toCp expected error==nil, got: %v", err)
 	}
 
-	err = FileConvertCodePage("123", UTF8, IBM866)
+	err = FileConvertCodePage("123", UTF8, CP866)
 	if err != nil {
 		t.Errorf("<FileConvertCodePage> on fromCp or toCp not Windows1251 or IBM866 expected error == nil, got: %v", err)
 	}
 
-	err = FileConvertCodePage("123", IBM866, UTF16LE)
+	err = FileConvertCodePage("123", CP866, UTF16LE)
 	if err != nil {
 		t.Errorf("<FileConvertCodePage> on fromCp or toCp not Windows1251 or IBM866 expected error == nil, got: %v", err)
 	}
 
-	err = FileConvertCodePage("test_files\\rune_encode_error.txt", IBM866, Windows1251)
+	err = FileConvertCodePage("test_files\\rune_encode_error.txt", CP866, Windows1251)
 	if err == nil {
 		t.Errorf("<FileConvertCodePage> expected error, got: %v", err)
 	}
 
 	os.Link("test_files\\866to1251.txt", "test_files\\866to1251.tmp")
-	err = FileConvertCodePage("test_files\\866to1251.tmp", IBM866, Windows1251)
+	err = FileConvertCodePage("test_files\\866to1251.tmp", CP866, Windows1251)
 	if err != nil {
 		t.Errorf("<FileConvertCodePage> expect no err, got: %v", err)
 	}
@@ -172,19 +169,19 @@ func TestFileConvertCodePage(t *testing.T) {
 
 //ConvertCodePage
 func TestStrConvertCodePage(t *testing.T) {
-	_, err := StrConvertCodePage("1234", IBM866, Windows1251)
+	_, err := StrConvertCodePage("1234", CP866, Windows1251)
 	if err != nil {
 		t.Errorf("<StrConvertCodePage> on test 1 return unexpected err: %v", err)
 	}
-	_, err = StrConvertCodePage("1234", Windows1251, IBM866)
+	_, err = StrConvertCodePage("1234", Windows1251, CP866)
 	if err != nil {
 		t.Errorf("<StrConvertCodePage> on test 2 return unexpected err: %v", err)
 	}
-	_, err = StrConvertCodePage("", IBM866, Windows1251)
+	_, err = StrConvertCodePage("", CP866, Windows1251)
 	if err != nil {
 		t.Errorf("<StrConvertCodePage> with empty string must return ERROR, but retrurn: %v", err)
 	}
-	_, err = StrConvertCodePage("1234", IBM866, IBM866)
+	_, err = StrConvertCodePage("1234", CP866, CP866)
 	if err != nil {
 		t.Errorf("<StrConvertCodePage> with equal fromCP and toCp must return nil, but retrurn: %v", err)
 	}

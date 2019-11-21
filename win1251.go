@@ -4,7 +4,6 @@ import "unicode"
 
 //unit for windows1251
 
-//TODO: нужно отличить от KOI-8r
 func runesMatch1251(data []byte, tbl *codePageTable) (counts int) {
 	for i := range data {
 		if i < 2 {
