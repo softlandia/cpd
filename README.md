@@ -6,20 +6,23 @@
 >install: go install
 
 golang library for detecting code page of text files  
-support russian code page:
+multibyte code pages and single-byte Russian code pages are supported:
 
 1. ASCII - default value
 2. Windows1251
 3. IBM866
 4. KOI8R
 5. UTF-16le
-6. UTF-16le
+6. UTF-16be
 7. UTF-8
 8. ISO8859-5
+9. UTF-32le
+10. UTF-32be
 
 ## feature ##
 
-if file contain only latin symbols, this file detected as UTF-8  
+encoding is determined both by the presence of the bom attribute and by heuristic  
+if file contain only latin symbols from first half of code page, this file detected as UTF-8  
 this is not a mistake, this is a completely correct statement
 
 on go vertion 1.12.6 add to exe 240 kB
@@ -41,8 +44,6 @@ ReadBufSize int = 1024 // count of byte to read from input reader by default
 
 1. CodePageDetect(r io.Reader, stopStr ...string) (IDCodePage, error)
 2. FileCodePageDetect(fn string, stopStr ...string) (IDCodePage, error)
-3. StrConvertCodePage(s string, fromCP, toCP IDCodePage) (string, error)
-4. FileConvertCodePage(fileName string, fromCP, toCP IDCodePage) error
 
 ## description ##
 
@@ -66,5 +67,5 @@ ReadBufSize int = 1024 // count of byte to read from input reader by default
 
 ## tests ##
 
-coverage: 84.0% of statements  
+coverage: 87.5% of statements  
 folder "test_files" contain files for testing, do not remove/change/add if want support tests is work
