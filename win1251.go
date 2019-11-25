@@ -6,17 +6,8 @@ import "unicode"
 
 func runesMatch1251(data []byte, tbl *codePageTable) (counts int) {
 	for i := range data {
-		if i < 2 {
+		if i < 1 {
 			continue
-		}
-		//case " Us" - separator_UPPER_symbol
-		if unicode.IsPunct(rune(data[i-2])) && isUpper1251(rune(data[i-1])) {
-			j := tbl.containsRune(rune(data[i]))
-			if j > 0 {
-				(*tbl)[j].count++
-				counts++
-				continue
-			}
 		}
 		//case "ab" - counts only if symbols are arranged in pairs
 		if is1251(rune(data[i-1])) {
@@ -24,6 +15,20 @@ func runesMatch1251(data []byte, tbl *codePageTable) (counts int) {
 			if j > 0 {
 				(*tbl)[j].count++
 				counts++
+			}
+			continue
+		}
+		if i < 2 {
+			continue
+		}
+		//case " Us" or ".Us"  separator_UPPER_lower
+		//IsPunct -
+		if (unicode.IsPunct(rune(data[i-2])) || unicode.IsSpace(rune(data[i-2]))) && isUpper1251(rune(data[i-1])) {
+			j := tbl.containsRune(rune(data[i]))
+			if (j > 0) && (isLower1251(rune(data[i]))) {
+				(*tbl)[j].count++
+				counts++
+				continue
 			}
 		}
 	}

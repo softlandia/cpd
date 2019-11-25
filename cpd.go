@@ -45,7 +45,11 @@ func CodePageDetect(r io.Reader, stopStr ...string) (IDCodePage, error) {
 		return ASCII, err
 	}
 
-	//is buf contains the BOM of utf-8, utf-16le or utf-16be
+	//возможно определение произойдёт по BOM или по валидности UTF тогда количество попаданий по кодовым страницам лучше занулить
+	//на работу это повлиять не может, но если вывести статистику попаданий, то цифры с предыдущего определения
+	CodepageDic.clearMatchCount()
+
+	//is buf contains the BOM of utf-8, utf-16le, utf-16be, utf-32le or utf-32be
 	if idCodePage, ok := CheckBOM(buf); ok {
 		return idCodePage, nil
 	}

@@ -4,18 +4,16 @@ import "encoding/binary"
 
 //unit for UTF8
 
-func runesMatchUTF8(data []byte, tbl *codePageTable) (counts int) {
-	n := len(data)/2 - 1
-	if n <= 0 {
+func runesMatchUTF8(d []byte, tbl *codePageTable) (counts int) {
+	if len(d) <= 3 {
 		return
 	}
-	for i := 0; i < n; i += 2 {
-		t := data[i : i+2]
+	for i := 0; i < len(d)-3; i++ {
+		t := d[i : i+2]
 		d := binary.BigEndian.Uint16(t)
 		j := tbl.containsRune(rune(d))
 		if j > 0 {
 			(*tbl)[j].count++
-			//counts++
 		}
 		if isUTF8(rune(d)) {
 			counts++
@@ -63,16 +61,19 @@ func ValidUTF8(data []byte) bool {
 			zerroByteCount++
 		}
 		n, cp := testUTF8bitPattern(data[i])
+		//n - количество байт следующих за этим которые будут использоваться для отображения данных
+		//n == 0 быть не может, это получается если битовая маска 1100 0000 -> для первого байта UTF-8 это не допустимо
 		if n == 0 {
 			return false
 		}
 		i++
 		var j int32 = 1
-		for ; j < n; j++ {
-			if (data[j] & 0xC0) != 0x80 {
+		for j = 1; j < n; j++ {
+			//байты с данными должны иметь маску 10xx xxxx
+			if (data[i] & 0xC0) != 0x80 {
 				return false
 			}
-			cp = (cp << 6) | int32(data[j]&0x3F)
+			cp = (cp << 6) | int32(data[i]&0x3F)
 			i++
 		}
 

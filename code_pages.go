@@ -66,6 +66,13 @@ func (o CodePage) MatchingRunes() string {
 //TCodepagesDic - type to store all supported code page
 type TCodepagesDic map[IDCodePage]CodePage
 
+func (o TCodepagesDic) clearMatchCount() {
+	for id, cp := range o {
+		cp.countMatch = 0
+		o[id] = cp
+	}
+}
+
 //Match - return the id of code page to which the data best matches
 func (o TCodepagesDic) Match(data []byte) (result IDCodePage) {
 	result = ASCII
@@ -93,7 +100,7 @@ var CodepageDic = TCodepagesDic{
 			//о          е		   а		  и			 н			т			с		  р			в
 			{0xAE, 0}, {0xA5, 0}, {0xA0, 0}, {0xA8, 0}, {0xAD, 0}, {0xE2, 0}, {0xE1, 0}, {0xE0, 0}, {0xA2, 0},
 			{0x8E, 0}, {0x85, 0}, {0x80, 0}, {0x88, 0}, {0x8D, 0}, {0x92, 0}, {0x91, 0}, {0x90, 0}, {0x82, 0}}},
-	UTF8: {UTF8, "UTF8", MatchRes{0}, runesMatchUTF8,
+	UTF8: {UTF8, "UTF-8", MatchRes{0}, runesMatchUTF8,
 		codePageTable{
 			{0, 0},
 			//о           е				а		    и			 н			  т			   с			р			в
@@ -102,10 +109,10 @@ var CodepageDic = TCodepagesDic{
 	Windows1251: {Windows1251, "Windows1251", MatchRes{0}, runesMatch1251,
 		codePageTable{
 			{0, 0},
-			//а		    и		   н		  с			 р			в		   л		  к			в
-			{0xE0, 0}, {0xE8, 0}, {0xED, 0}, {0xF1, 0}, {0xF0, 0}, {0xE2, 0}, {0xEB, 0}, {0xEA, 0}, {0xE2, 0},
-			{0xC0, 0}, {0xC8, 0}, {0xCD, 0}, {0xD1, 0}, {0xD0, 0}, {0xC2, 0}, {0xCB, 0}, {0xCA, 0}, {0xC2, 0}}},
-	KOI8R: {KOI8R, "KOI8R", MatchRes{0}, runesMatchKOI8,
+			//а		    и		   н		  с			 р			в		   л		  к			у
+			{0xE0, 0}, {0xE8, 0}, {0xED, 0}, {0xF1, 0}, {0xF0, 0}, {0xE2, 0}, {0xEB, 0}, {0xEA, 0}, {0xF3, 0},
+			{0xC0, 0}, {0xC8, 0}, {0xCD, 0}, {0xD1, 0}, {0xD0, 0}, {0xC2, 0}, {0xCB, 0}, {0xCA, 0}, {0xD3, 0}}},
+	KOI8R: {KOI8R, "KOI8-R", MatchRes{0}, runesMatchKOI8,
 		codePageTable{
 			//о		    а		   и		  т			 с			в		   л		  к			м
 			{0, 0},
@@ -117,21 +124,31 @@ var CodepageDic = TCodepagesDic{
 			{0, 0},
 			{0xDE, 0}, {0xD0, 0}, {0xD8, 0}, {0xE2, 0}, {0xE1, 0}, {0xD2, 0}, {0xDB, 0}, {0xDA, 0}, {0xD5, 0},
 			{0xBF, 0}, {0xB0, 0}, {0xB8, 0}, {0xC2, 0}, {0xC1, 0}, {0xB2, 0}, {0xBB, 0}, {0xBA, 0}, {0xB5, 0}}},
-	UTF16LE: {UTF16LE, "UTF16LE", MatchRes{0}, runesMatchUTF16LE,
+	UTF16LE: {UTF16LE, "UTF-16LE", MatchRes{0}, runesMatchUTF16LE,
 		codePageTable{
 			{0, 0},
 			//о           е				а		    и			 н			  т			   с			р			в
 			{0x3E04, 0}, {0x3504, 0}, {0x1004, 0}, {0x3804, 0}, {0x3D04, 0}, {0x4204, 0}, {0x4104, 0}, {0x4004, 0}, {0x3204, 0},
 			{0x1E04, 0}, {0x1504, 0}, {0x3004, 0}, {0x1804, 0}, {0x1D04, 0}, {0x2204, 0}, {0x2104, 0}, {0x2004, 0}, {0x1204, 0}}},
-	UTF16BE: {UTF16BE, "UTF16BE", MatchRes{0}, runesMatchUTF16BE,
+	UTF16BE: {UTF16BE, "UTF-16BE", MatchRes{0}, runesMatchUTF16BE,
 		codePageTable{
 			{0, 0},
 			//о           е				а		    и			 н			  т			   с			р			в
 			{0x043E, 0}, {0x0435, 0}, {0x0410, 0}, {0x0438, 0}, {0x043D, 0}, {0x0442, 0}, {0x0441, 0}, {0x0440, 0}, {0x0432, 0},
 			{0x041E, 0}, {0x0415, 0}, {0x0430, 0}, {0x0418, 0}, {0x041D, 0}, {0x0422, 0}, {0x0421, 0}, {0x0420, 0}, {0x0412, 0}}},
+	UTF32BE: {UTF32BE, "UTF-32BE", MatchRes{0}, runesMatchUTF32BE,
+		codePageTable{
+			{0, 0},
+			{0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0},
+			{0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}}},
+	UTF32LE: {UTF32LE, "UTF-32LE", MatchRes{0}, runesMatchUTF32LE,
+		codePageTable{
+			{0, 0},
+			{0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0},
+			{0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}}},
 }
 
-//codePageName - string of code page name
+//codePageName - string of code page name runesMatchUTF32LE
 var codePageName = map[IDCodePage]string{
 	ASCII:            "ASCII",
 	ISOLatinCyrillic: "ISO-8859-5",
@@ -147,77 +164,3 @@ var codePageName = map[IDCodePage]string{
 	UTF32LE:          "UTF-32LE",
 	UTF32BE:          "UTF-32BE",
 }
-
-/*
-//TCodePages - type for store all code page
-type TCodePages []CodePage
-
-//Match - return IDCodePage
-//simple calculate count entry data runes in standart code page table
-func (o TCodePages) Match(data []byte) (result IDCodePage) {
-	result = ASCII
-	maxCount := 0
-	for i, cp := range o {
-		o[i].countMatch = cp.match(data, &o[i].table)
-		if o[i].countMatch > maxCount {
-			maxCount = o[i].countMatch
-			result = cp.id
-		}
-	}
-	return result
-}
-
-//DeepMach -
-func (o *TCodePages) DeepMach(data []byte) IDCodePage {
-	return ASCII
-}
-
-//CodePages - slice of code pages
-var CodePages = TCodePages{
-	{ASCII, "ASCII", MatchRes{0}, runesMatchASCII,
-		codePageTable{{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}},
-	{IBM866, "IBM866", MatchRes{0}, runesMatch866,
-		codePageTable{
-			//first element serves as sign of absence
-			{0, 0},
-			//о          е		   а		  и			 н			т			с		  р			в
-			{0xAE, 0}, {0xA5, 0}, {0xA0, 0}, {0xA8, 0}, {0xAD, 0}, {0xE2, 0}, {0xE1, 0}, {0xE0, 0}, {0xA2, 0},
-			{0x8E, 0}, {0x85, 0}, {0x80, 0}, {0x88, 0}, {0x8D, 0}, {0x92, 0}, {0x91, 0}, {0x90, 0}, {0x82, 0}}},
-	{UTF8, "UTF8", MatchRes{0}, runesMatchUTF8,
-		codePageTable{
-			{0, 0},
-			//о           е				а		    и			 н			  т			   с			р			в
-			{0xD0BE, 0}, {0xD0B5, 0}, {0xD0B0, 0}, {0xD0B8, 0}, {0xD0BD, 0}, {0xD182, 0}, {0xD181, 0}, {0xD180, 0}, {0xD0B2, 0},
-			{0xD09E, 0}, {0xD095, 0}, {0xD090, 0}, {0xD098, 0}, {0xD0AD, 0}, {0xD0A2, 0}, {0xD0A1, 0}, {0xD0A0, 0}, {0xD092, 0}}},
-	{Windows1251, "Windows1251", MatchRes{0}, runesMatch1251,
-		codePageTable{
-			{0, 0},
-			//а		    и		   н		  с			 р			в		   л		  к			в
-			{0xE0, 0}, {0xE8, 0}, {0xED, 0}, {0xF1, 0}, {0xF0, 0}, {0xE2, 0}, {0xEB, 0}, {0xEA, 0}, {0xE2, 0},
-			{0xC0, 0}, {0xC8, 0}, {0xCD, 0}, {0xD1, 0}, {0xD0, 0}, {0xC2, 0}, {0xCB, 0}, {0xCA, 0}, {0xC2, 0}}},
-	{KOI8R, "KOI8R", MatchRes{0}, runesMatchKOI8,
-		codePageTable{
-			//о		    а		   и		  т			 с			в		   л		  к			м
-			{0, 0},
-			{0xCF, 0}, {0xC1, 0}, {0xC9, 0}, {0xD4, 0}, {0xD3, 0}, {0xD7, 0}, {0xCC, 0}, {0xCB, 0}, {0xCD, 0},
-			{0xEF, 0}, {0xE1, 0}, {0xE9, 0}, {0xF4, 0}, {0xF3, 0}, {0xF7, 0}, {0xEC, 0}, {0xEB, 0}, {0xED, 0}}},
-	{ISOLatinCyrillic, "ISO-8859-5", MatchRes{0}, runesMatchISO88595,
-		codePageTable{
-			//о		    а		   и		  т			 с			в		   л		  к			е
-			{0, 0},
-			{0xDE, 0}, {0xD0, 0}, {0xD8, 0}, {0xE2, 0}, {0xE1, 0}, {0xD2, 0}, {0xDB, 0}, {0xDA, 0}, {0xD5, 0},
-			{0xBF, 0}, {0xB0, 0}, {0xB8, 0}, {0xC2, 0}, {0xC1, 0}, {0xB2, 0}, {0xBB, 0}, {0xBA, 0}, {0xB5, 0}}},
-	{UTF16LE, "UTF16LE", MatchRes{0}, runesMatchUTF16LE,
-		codePageTable{
-			{0, 0},
-			//о           е				а		    и			 н			  т			   с			р			в
-			{0x3E04, 0}, {0x3504, 0}, {0x1004, 0}, {0x3804, 0}, {0x3D04, 0}, {0x4204, 0}, {0x4104, 0}, {0x4004, 0}, {0x3204, 0},
-			{0x1E04, 0}, {0x1504, 0}, {0x3004, 0}, {0x1804, 0}, {0x1D04, 0}, {0x2204, 0}, {0x2104, 0}, {0x2004, 0}, {0x1204, 0}}},
-	{UTF16BE, "UTF16BE", MatchRes{0}, runesMatchUTF16BE,
-		codePageTable{
-			{0, 0},
-			//о           е				а		    и			 н			  т			   с			р			в
-			{0x043E, 0}, {0x0435, 0}, {0x0410, 0}, {0x0438, 0}, {0x043D, 0}, {0x0442, 0}, {0x0441, 0}, {0x0440, 0}, {0x0432, 0},
-			{0x041E, 0}, {0x0415, 0}, {0x0430, 0}, {0x0418, 0}, {0x041D, 0}, {0x0422, 0}, {0x0421, 0}, {0x0420, 0}, {0x0412, 0}}},
-}
-*/
