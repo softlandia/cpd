@@ -38,6 +38,10 @@ type MatchRes struct {
 	countMatch int
 }
 
+func (m MatchRes) String() string {
+	return fmt.Sprintf("%d", m.countMatch)
+}
+
 //CodePage - содержит данные по конкретной кодовой странице
 type CodePage struct {
 	id       IDCodePage    //id of code page
@@ -66,6 +70,9 @@ func (o CodePage) MatchingRunes() string {
 //TCodepagesDic - type to store all supported code page
 type TCodepagesDic map[IDCodePage]CodePage
 
+//если кодировка файла определяется по BOM или по внутренней структуре,
+//то счётчики совпадений будут заполнены не корректно
+//обнуляем счётчики
 func (o TCodepagesDic) clearMatchCount() {
 	for id, cp := range o {
 		cp.countMatch = 0
@@ -74,6 +81,7 @@ func (o TCodepagesDic) clearMatchCount() {
 }
 
 //Match - return the id of code page to which the data best matches
+//TODO для CP1251 и KOI8-r нужни убирать случаи "рУ" маленькая+большая. В одной кодировке это "ру" а в другой "Пс"
 func (o TCodepagesDic) Match(data []byte) (result IDCodePage) {
 	result = ASCII
 	maxCount := 0
