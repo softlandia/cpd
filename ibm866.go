@@ -5,18 +5,15 @@ package cpd
 //tbl - массив структур (19 штук), 18 рабочих, нулевой элемент технический
 //каждая структура состоит из искомого символа и счётчика
 //для CP866 достаточно только вычисления счётчика по базовому алгоритму:
-//подсчитываем случи когда нужные нам буквы встречаются подряд
-func runesMatch866(data []byte, tbl *codePageTable) (counts int) {
+//подсчитываем случаи когда нужные нам буквы просто встречаются
+//TODO возможно стоит вынести (*tbl)[j].count++ из if поскольку даже если символ не найден, то увеличить счётчик с индексом 0 можно. зато читаемость улучшится
+//тем более нулевой элемент таблицы мы ведь завели, собственно для этого
+func runesMatch866(data []byte, tbl *codePageTable) (foundedCounts int) {
 	for i := range data {
-		if i == 0 {
-			continue
-		}
-		if tbl.containsRune(rune(data[i-1])) > 0 {
-			j := tbl.containsRune(rune(data[i]))
-			if j > 0 {
-				(*tbl)[j].count++
-				counts++
-			}
+		j := tbl.containsRune(rune(data[i])) //получили номер символа в таблице
+		(*tbl)[j].count++
+		if j > 0 {
+			foundedCounts++
 		}
 	}
 	return

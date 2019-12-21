@@ -56,6 +56,7 @@ func (o CodePage) String() string {
 }
 
 //MatchingRunes - return string with rune/counts
+//TODO Проанализировать вывод cp.MatchingRunes() приводимые счётчики не соответствуют итоговому, ИТОГОВЫЙ = 0, а в счётчиках каша
 func (o CodePage) MatchingRunes() string {
 	var sb strings.Builder
 	fmt.Fprint(&sb, "rune/counts: ")
@@ -81,7 +82,6 @@ func (o TCodepagesDic) clearMatchCount() {
 }
 
 //Match - return the id of code page to which the data best matches
-//TODO для CP1251 и KOI8-r нужни убирать случаи "рУ" маленькая+большая. В одной кодировке это "ру" а в другой "Пс"
 func (o TCodepagesDic) Match(data []byte) (result IDCodePage) {
 	result = ASCII
 	maxCount := 0

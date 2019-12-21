@@ -2,21 +2,16 @@ package cpd
 
 //UTF-32LE
 
-//первые 2 байта практически всегда больше вторых 2 байтов
-//TODO лучше попробовать оценить количество 0x0 байтов по отношению к общему и если их много, то только тогла определять LE/BE
-func runesMatchUTF32LE(d []byte, tbl *codePageTable) (counts int) {
-	var (
-		w1 int64
-		w2 int64
-	)
+//вторые 2 байта практически всегда 0
+//используемый признак не сработает если больше половины текста будет набрано символами с 4 значащими байтами, не представляю, что это за текст...
+func runesMatchUTF32LE(d []byte, tbl *codePageTable) (zerroCounts int) {
 	for i := 0; i < len(d)-4; i += 4 {
-		w1 = int64(d[i]) * int64(d[i+1])
-		w2 = int64(d[i+2]) * int64(d[i+3])
-		if w1 < w2 {
-			counts = 0 //все первые должны быть больше, иначе это не UTF-32le
-			break
+		if (int(d[i+2]) + int(d[i+3])) == 0 {
+			zerroCounts++
 		}
-		counts++
+	}
+	if zerroCounts*2 < len(d)/4 { //количество байтов в файле UTF-32 со значением 0 должно быть больше половины
+		return 0
 	}
 	return
 }

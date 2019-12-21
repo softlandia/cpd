@@ -21,7 +21,7 @@ func runesMatch1251(data []byte, tbl *codePageTable) (counts int) {
 		if i < 2 {
 			continue
 		}
-		//case " Us" or ".Us"  separator_UPPER_lower
+		//case " Us" separator_UPPER_lower
 		//IsPunct -
 		if (unicode.IsPunct(rune(data[i-2])) || unicode.IsSpace(rune(data[i-2]))) && isUpper1251(rune(data[i-1])) {
 			j := tbl.containsRune(rune(data[i]))

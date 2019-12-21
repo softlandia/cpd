@@ -3,7 +3,7 @@ package cpd
 import "encoding/binary"
 
 //unit for UTF8
-
+//TODO на файле win1251_upper.txt выдаёт два попадания! Там вообще попаданий быть не должно!
 func runesMatchUTF8(d []byte, tbl *codePageTable) (counts int) {
 	if len(d) <= 3 {
 		return
