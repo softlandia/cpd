@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"reflect"
+	"unicode"
 
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/transform"
@@ -47,7 +48,7 @@ func CodePageDetect(r io.Reader, stopStr ...string) (IDCodePage, error) {
 
 	//возможно определение произойдёт по BOM или по валидности UTF тогда количество попаданий по кодовым страницам лучше занулить
 	//на работу это повлиять не может, но если вывести статистику попаданий, то увидим цифры с предыдущего определения.
-	CodepageDic.clearMatchCount()
+	CodepageDic.clear()
 
 	//match code page from BOM, support: utf-8, utf-16le, utf-16be, utf-32le or utf-32be
 	if idCodePage, ok := CheckBOM(buf); ok {
@@ -73,11 +74,11 @@ func FileConvertCodePage(fileName string, fromCP, toCP IDCodePage) error {
 		return nil
 	}
 
-	if (fromCP != Windows1251) && (fromCP != CP866) {
+	if (fromCP != CP1251) && (fromCP != CP866) {
 		return nil
 	}
 
-	if (toCP != Windows1251) && (toCP != CP866) {
+	if (toCP != CP1251) && (toCP != CP866) {
 		return nil
 	}
 
@@ -118,6 +119,11 @@ func ToUTF8(s string) string {
 	return s
 }
 
+//IsSeparator - return true if input rune is SPACE or PUNCT
+func IsSeparator(r rune) bool {
+	return unicode.IsPunct(r) || unicode.IsSpace(r)
+}
+
 //StrConvertCodePage - convert string from one code page to another
 // function for future, at now support convert only from/to Windows1251/IBM866
 func StrConvertCodePage(s string, fromCP, toCP IDCodePage) (string, error) {
@@ -133,13 +139,13 @@ func StrConvertCodePage(s string, fromCP, toCP IDCodePage) (string, error) {
 	switch fromCP {
 	case CP866:
 		s, _, err = transform.String(charmap.CodePage866.NewDecoder(), s)
-	case Windows1251:
+	case CP1251:
 		s, _, err = transform.String(charmap.Windows1251.NewDecoder(), s)
 	}
 	switch toCP {
 	case CP866:
 		s, _, err = transform.String(charmap.CodePage866.NewEncoder(), s)
-	case Windows1251:
+	case CP1251:
 		s, _, err = transform.String(charmap.Windows1251.NewEncoder(), s)
 	}
 	return s, err

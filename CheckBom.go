@@ -24,7 +24,7 @@ func CheckBOM(buf []byte) (id IDCodePage, res bool) {
 	return ASCII, false
 }
 
-func bomUTF8(b []byte) bool {
+/*func bomUTF8(b []byte) bool {
 	return (len(b) > 3) && (b[0] == 0xEF) && (b[1] == 0xBB) && (b[2] == 0xBF)
 }
 
@@ -35,12 +35,4 @@ func bomUTF16le(b []byte) bool {
 func bomUTF16be(b []byte) bool {
 	return (len(b) > 2) && (b[0] == 0xFE) && (b[1] == 0xFF)
 }
-
-//ASCII block
-func itASCII(r rune, tbl *codePageTable) int {
-	return 0
-}
-
-func runesMatchASCII(b []byte, tbl *codePageTable) int {
-	return 0
-}
+*/

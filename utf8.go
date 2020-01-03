@@ -3,23 +3,24 @@ package cpd
 import "encoding/binary"
 
 //unit for UTF8
-//TODO на файле win1251_upper.txt выдаёт два попадания! Там вообще попаданий быть не должно!
-func runesMatchUTF8(d []byte, tbl *codePageTable) (counts int) {
+
+func matchUTF8(d []byte, tbl *codePageTable) MatchRes {
+	matches := 0
 	if len(d) <= 3 {
-		return
+		return MatchRes{matches, 0}
 	}
 	for i := 0; i < len(d)-3; i++ {
 		t := d[i : i+2]
 		d := binary.BigEndian.Uint16(t)
-		j := tbl.containsRune(rune(d))
+		j := tbl.index(rune(d))
 		if j > 0 {
 			(*tbl)[j].count++
 		}
 		if isUTF8(rune(d)) {
-			counts++
+			matches++
 		}
 	}
-	return
+	return MatchRes{matches, 0}
 }
 
 //тест на возможное начало байтов в UTF-8
@@ -62,7 +63,7 @@ func ValidUTF8(data []byte) bool {
 		}
 		n, cp := testUTF8bitPattern(data[i])
 		//n - количество байт следующих за этим которые будут использоваться для отображения данных
-		//n == 0 быть не может, это получается если битовая маска 1100 0000 -> для первого байта UTF-8 это не допустимо
+		//n == 0 быть не может, это получается если битовая маска 1000 0000 -> для первого байта UTF-8 это не допустимо
 		if n == 0 {
 			return false
 		}

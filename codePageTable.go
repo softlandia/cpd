@@ -2,10 +2,9 @@ package cpd
 
 //codePageTable
 
-//return index of rune in code page table
-//return 0 if rune not in code page table
-//TODO надо переименовать, сейчас звучит как метод возвращающий true/false, должно быть типа index()
-func (t *codePageTable) containsRune(r rune) int {
+// return index of rune in code page table
+// return 0 if rune not in code page table
+func (t *codePageTable) index(r rune) int {
 	for j, e := range *t {
 		if r == e.code {
 			return j
@@ -14,11 +13,16 @@ func (t *codePageTable) containsRune(r rune) int {
 	return 0
 }
 
-func (t *codePageTable) isUpper(r rune) bool {
-	for i := 10; i < len(t); i++ {
-		if r == (*t)[i].code {
-			return true
-		}
+func (t *codePageTable) clear() {
+	for i := 0; i < len(t); i++ {
+		t[i].count = 0
 	}
-	return false
+}
+
+func (t *codePageTable) founded() (res int) {
+	//0 элемент исключён, он не содержит количество найденных букв
+	for i := 1; i < len(t); i++ {
+		res += t[i].count
+	}
+	return
 }

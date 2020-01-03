@@ -21,10 +21,10 @@ no ID                Name
 7. UTF16BE:          "UTF-16BE",
 8. UTF32:            "UTF-32",
 9. KOI8R:            "KOI8-R",
-10. Unicode:          "Unicode",
-11. UTF7:             "UTF-7",
-12. UTF32LE:          "UTF-32LE",
-13. UTF32BE:          "UTF-32BE",
+10. Unicode:         "Unicode",
+11. UTF7:            "UTF-7",
+12. UTF32LE:         "UTF-32LE",
+13. UTF32BE:         "UTF-32BE",
 
 ## особенности ##
 
@@ -58,6 +58,10 @@ ReadBufSize int = 1024 // количество байт считываемых �
 
 ## описание ##
 
+    func CodePageAutoDetect(content []byte) (result IDCodePage) 
+      автоматическое определеие кодировки по входному слайсу байт
+      использовать вместо golang.org/x/net/html/charset.DetermineEncoding()
+
     CodePageDetect(r io.Reader, stopStr ...string) (IDCodePage, error)
       определяет кодовую страницу считывая поток байтов из 'r' 
       используется 'reflect.ValueOf(r).IsValid()' для проверки 'r' на существование
@@ -71,5 +75,5 @@ ReadBufSize int = 1024 // количество байт считываемых �
 
 ## tests ##
 
-coverage: 87.5% of statements  
+coverage: 79% of statements  
 в папке "test_files" лежат файлы для тестов, соответственно не править и не удалять

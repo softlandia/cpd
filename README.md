@@ -25,7 +25,7 @@ encoding is determined both by the presence of the bom attribute and by heuristi
 if file contain only latin symbols from first half of code page, this file detected as UTF-8  
 this is not a mistake, this is a completely correct statement
 
-on go vertion 1.12.6 add to exe 240 kB
+on go vertion 1.12.6 add to exe 250 kB
 
 ## dependences ##
 
@@ -47,6 +47,10 @@ ReadBufSize int = 1024 // count of byte to read from input reader by default
 
 ## description ##
 
+    func CodePageAutoDetect(content []byte) (result IDCodePage) 
+      autodetect code page from input slice of byte
+      use this function instead golang.org/x/net/html/charset.DetermineEncoding()
+
     CodePageDetect(r io.Reader, stopStr ...string) (IDCodePage, error)
       detect code page of ascii data from reader 'r' 
       use library 'reflect' to check input reader
@@ -67,5 +71,5 @@ ReadBufSize int = 1024 // count of byte to read from input reader by default
 
 ## tests ##
 
-coverage: 87.5% of statements  
+coverage: 79% of statements  
 folder "test_files" contain files for testing, do not remove/change/add if want support tests is work

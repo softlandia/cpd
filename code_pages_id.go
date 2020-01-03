@@ -77,10 +77,10 @@ const (
 	// IBM NLDG Volume 2 (SE09-8002-03) August 1994
 	CP866 IDCodePage = 2086
 
-	// Windows1251 is the uint16 identifier with IANA name windows-1251.
+	// CP1251 is the uint16 identifier with IANA name windows-1251.
 	//
 	// Microsoft http://www.iana.org/assignments/charset-reg/windows-1251
-	Windows1251 IDCodePage = 2251
+	CP1251 IDCodePage = 2251
 
 	// Windows1252 is the uint16 identifier with IANA name windows-1252.
 	//
