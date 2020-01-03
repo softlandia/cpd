@@ -10,21 +10,18 @@
 предназначена для автоматического определения кодовой страницы текстовых файлов или потоков байт  
 поддерживает следующие кодовые страницы:
 
-no ID                Name
+no ID                Name		uint16
 
-1. ASCII:            "ASCII",
-2. ISOLatinCyrillic: "ISO-8859-5",
-3. CP866:            "CP866",
-4. Windows1251:      "Windows-1251",
-5. UTF8:             "UTF-8",
-6. UTF16LE:          "UTF-16LE",
-7. UTF16BE:          "UTF-16BE",
-8. UTF32:            "UTF-32",
-9. KOI8R:            "KOI8-R",
-10. Unicode:         "Unicode",
-11. UTF7:            "UTF-7",
-12. UTF32LE:         "UTF-32LE",
-13. UTF32BE:         "UTF-32BE",
+1. ASCII:            "ASCII",		3
+2. ISOLatinCyrillic: "ISO-8859-5",	8
+3. CP866:            "CP866",		2086
+4. Windows1251:      "Windows-1251",	2251
+5. UTF8:             "UTF-8",		106
+6. UTF16LE:          "UTF-16LE",	1014
+7. UTF16BE:          "UTF-16BE",	1013
+8. KOI8R:            "KOI8-R",		2084
+9. UTF32LE:          "UTF-32LE",	1019
+10. UTF32BE:         "UTF-32BE",	1018
 
 ## особенности ##
 
