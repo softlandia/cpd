@@ -1,5 +1,5 @@
 //Package cpd - code page detect
-// (c) 2019 softlandia@gmail.com
+// (c) 2020 softlandia@gmail.com
 package cpd
 
 import (
@@ -34,7 +34,6 @@ func FileCodePageDetect(fn string, stopStr ...string) (IDCodePage, error) {
 
 //CodePageDetect - detect code page of ascii data from reader 'r'
 func CodePageDetect(r io.Reader, stopStr ...string) (IDCodePage, error) {
-	//initial test
 	//test input interfase
 	if !reflect.ValueOf(r).IsValid() {
 		return ASCII, fmt.Errorf("input reader is nil")
@@ -46,8 +45,8 @@ func CodePageDetect(r io.Reader, stopStr ...string) (IDCodePage, error) {
 		return ASCII, err
 	}
 
-	//возможно определение произойдёт по BOM или по валидности UTF тогда количество попаданий по кодовым страницам лучше занулить
-	//на работу это повлиять не может, но если вывести статистику попаданий, то увидим цифры с предыдущего определения.
+	//clear all counts and matching result
+	//CodepageDic - global var and need cleaning befor reuse
 	CodepageDic.clear()
 
 	//match code page from BOM, support: utf-8, utf-16le, utf-16be, utf-32le or utf-32be

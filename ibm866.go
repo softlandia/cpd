@@ -2,20 +2,17 @@ package cpd
 
 //unit for ibm866
 
-//tbl - массив структур (19 штук), 18 рабочих, нулевой элемент технический
-//каждая структура состоит из искомого символа и счётчика
-//для CP866 достаточно только вычисления счётчика по базовому алгоритму:
-//подсчитываем случаи когда нужные нам буквы просто встречаются
+// for CP866 calculate only count of letter from table 'tbl'
 func match866(data []byte, tbl *codePageTable) MatchRes {
-	matches := 0
+	//	matches := 0
 	for i := range data {
-		j := tbl.index(rune(data[i])) //получили номер символа в таблице
+		j := tbl.index(rune(data[i])) //return 0 if rune data[i] not found
 		(*tbl)[j].count++
-		if j > 0 {
-			matches++
-		}
+		/*		if j > 0 {
+				matches++
+			}*/
 	}
-	return MatchRes{matches, 0}
+	return MatchRes{tbl.founded(), 0}
 }
 
 const (

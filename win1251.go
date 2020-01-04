@@ -42,7 +42,7 @@ var vowels1251 = [256]byte{
 	/* F */ 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01, 0x01,
 }
 
-// cvPairs1251 - подсчитывает количество пар СОГЛАСНАЯ+ГЛАСНАЯ в кодировке CP1251
+// cvPairs1251 - counts the number of pairs consonans+vowels
 func cvPairs1251(d []byte) (cvPairsCount int) {
 	for i := 0; i < len(d)-1; i++ {
 		if consonans1251[d[i]] > 0 {
@@ -55,7 +55,7 @@ func cvPairs1251(d []byte) (cvPairsCount int) {
 	return cvPairsCount
 }
 
-// matchRunes1251 - подсчитывает количество символов соответствующих популярным буквам русского алфавита
+// matchRunes1251 - counts the number of characters that are the most popular letters of the Russian alphabet
 func matchRune1251(d []byte, tbl *codePageTable) int {
 	for i := 0; i < len(d); i++ {
 		if is1251(d[i]) {

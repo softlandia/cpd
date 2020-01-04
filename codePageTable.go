@@ -19,6 +19,7 @@ func (t *codePageTable) clear() {
 	}
 }
 
+// founded - calculates total number of matching
 func (t *codePageTable) founded() (res int) {
 	//0 элемент исключён, он не содержит количество найденных букв
 	for i := 1; i < len(t); i++ {

@@ -1,7 +1,3 @@
-// file from "golang.org\x\text\encoding\internal\identifier" (c) golang autors
-// contain identifier of code page
-// IDCodePage implements interface String()
-
 package cpd
 
 import (
@@ -9,31 +5,31 @@ import (
 	"strings"
 )
 
-//IDCodePage - index of code page
+// IDCodePage - index of code page
+// implements interface String()
 type IDCodePage uint16
 
 func (i IDCodePage) String() string {
 	return codePageName[i]
 }
 
-//itRuneMatch - return 1 if rune from this code page, 0 else
-// function exist in every CodePage
-//type itRuneMatch func(r rune, tbl *codePageTable) int
-
-//runesMatch - return count of entry elements of data to code page
-type runesMatch func(data []byte, tbl *codePageTable) MatchRes
+// matcher - return struct MatchRes - two criterion
+// this function must be realised in each code page
+type matcher func(data []byte, tbl *codePageTable) MatchRes
 
 type tableElement struct {
-	code  rune //руна которая нас интересует, она присутствует в этой кодовой таблице как буква алфавита
-	count int  //количество вхождений данной руны
+	code  rune //rune (letter) of the alphabet that interests us
+	count int  //the number of these runes found in the text
 }
 
-// codePageTable - содержит основные (наиболее часто встречаемые) символы алфавита в данной кодировке
-// первые 9 прописные, 2-я девятка заглавные
+// codePageTable - stores 9 letters, we will look for them in the text 
+// element with index 0 for the case of non-location
+// first 9 elements lowercase, second 9 elements uppercase
 type codePageTable [19]tableElement
 
-// MatchRes - итоговый критерий совпадения массива данных с кодовой страницей
-// возможно в дальнейшем усложнится
+// MatchRes - result criteria
+// countMatch - the number of letters founded in text
+// countCvPairs - then number of pairs consonans+vowels
 type MatchRes struct {
 	countMatch   int
 	countCvPairs int
@@ -43,12 +39,12 @@ func (m MatchRes) String() string {
 	return fmt.Sprintf("%d, %d", m.countMatch, m.countCvPairs)
 }
 
-// CodePage - содержит данные по конкретной кодовой странице
+// CodePage - realize code page
 type CodePage struct {
 	id       IDCodePage    //id of code page
 	name     string        //name of code page
 	MatchRes               //count of matching
-	match    runesMatch    //method to calculate from input data count of entry to codepage
+	match    matcher       //method for calculating the criteria for the proximity of input data to this code page
 	table    codePageTable //table of main alphabet rune of this code page, contain [code, count]
 }
 
@@ -68,7 +64,7 @@ func (o CodePage) MatchingRunes() string {
 	return sb.String()
 }
 
-//TCodepagesDic - type to store all supported code page
+// TCodepagesDic - type to store all supported code page
 type TCodepagesDic map[IDCodePage]CodePage
 
 //CodepageDic -
@@ -131,12 +127,11 @@ var CodepageDic = TCodepagesDic{
 			{0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}, {0x0, 0}}},
 }
 
-//если кодировка файла определяется по BOM или по внутренней структуре,
-//то счётчики совпадений будут заполнены не корректно
-//обнуляем счётчики
+//befor detecting of code page need clear all counts
+//this not for correct run, this need only if we want get correct statistic
 func (o TCodepagesDic) clear() {
 	for id, cp := range o {
-		cp.countMatch = 0
+		cp.MatchRes = MatchRes{0, 0}
 		cp.table.clear()
 		o[id] = cp
 	}
