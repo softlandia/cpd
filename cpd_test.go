@@ -35,28 +35,28 @@ type tFileCodePageDetectTest struct {
 }
 
 var dFileCodePageDetect = []tFileCodePageDetectTest{
-	{"test_files\\866&1251.txt", "", nil, CP1251},            //file contain more 1251 then 866
-	{"test_files\\empty_file.txt", "", nil, UTF8},            //file exist but empty, no error, return ASCII
-	{"test_files\\IBM866.txt", "", nil, CP866},               //file contain IBM866
-	{"test_files\\ISO8859-5.txt", "", nil, ISOLatinCyrillic}, //file contain ISO8859-5
-	{"test_files\\KOI8-r.txt", "", nil, KOI8R},               //file contain KOI8
-	{"test_files\\KOI8-r2.txt", "", nil, KOI8R},              //file contain KOI8
-	{"test_files\\noCodePage.txt", "", nil, UTF8},            //file contain rune only ASCII
-	{"test_files\\rune_encode_error.txt", "", nil, ASCII},    //file contain special rune -> encode error, but detect NO error
-	{"test_files\\rune_error_1251.txt", "", nil, CP1251},     //file contain 1251 and special rune -> encode error, but detect NO error
-	{"test_files\\utf8.txt", "", nil, UTF8},                  //file contain utf8 with out bom rune at start
-	{"test_files\\utf8-wbom.txt", "", nil, UTF8},             //file contain utf8 with bom prefix
-	{"test_files\\utf8-woBOM.txt", "", nil, UTF8},            //file contain utf8 with out bom rune at start
-	{"test_files\\utf16be-wBOM.txt", "", nil, UTF16BE},       //file contain utf16 big endian with bom
-	{"test_files\\utf16be-woBOM.txt", "", nil, UTF16BE},      //file contain utf16 big endian without bom
-	{"test_files\\utf16le-wBOM.txt", "", nil, UTF16LE},       //file contain utf16 little endian with bom
-	{"test_files\\utf16le-woBOM.txt", "", nil, UTF16LE},      //file contain utf16 little endian without bom
-	{"test_files\\utf32be-wBOM.txt", "", nil, UTF32BE},       //file contain utf32 big endian with bom
-	{"test_files\\utf32be-woBOM.txt", "", nil, UTF32BE},      //file contain utf32 big endian without bom
-	{"test_files\\utf32le-wBOM.txt", "", nil, UTF32LE},       //file contain utf32 little endian with bom
-	{"test_files\\utf32le-woBOM.txt", "", nil, UTF32LE},      //file contain utf32 little endian without bom
-	{"test_files\\Win1251.txt", "", nil, CP1251},             //file contain Windows1251
-	{"test_files\\win1251_upper.txt", "", nil, CP1251},       //file contain Windows1251
+	{"test_files\\866&1251.txt", "", nil, CP1251},                    //file contain more 1251 then 866
+	{"test_files\\empty_file.txt", "", nil, UTF8},                    //file exist but empty, no error, return ASCII
+	{"test_files\\IBM866.txt", "", nil, CP866},                       //file contain IBM866
+	{"test_files\\ISO8859-5.txt", "", nil, ISOLatinCyrillic},         //file contain ISO8859-5
+	{"test_files\\KOI8-r.txt", "", nil, KOI8R},                       //file contain KOI8
+	{"test_files\\KOI8-r2.txt", "", nil, KOI8R},                      //file contain KOI8
+	{"test_files\\noCodePage.txt", "", nil, UTF8},                    //file contain rune only ASCII
+	{"test_files\\rune_encode_error.txt", "", nil, ISOLatinCyrillic}, //file contain special rune -> encode error, but detect NO error
+	{"test_files\\rune_error_1251.txt", "", nil, CP1251},             //file contain 1251 and special rune -> encode error, but detect NO error
+	{"test_files\\utf8.txt", "", nil, UTF8},                          //file contain utf8 with out bom rune at start
+	{"test_files\\utf8-wbom.txt", "", nil, UTF8},                     //file contain utf8 with bom prefix
+	{"test_files\\utf8-woBOM.txt", "", nil, UTF8},                    //file contain utf8 with out bom rune at start
+	{"test_files\\utf16be-wBOM.txt", "", nil, UTF16BE},               //file contain utf16 big endian with bom
+	{"test_files\\utf16be-woBOM.txt", "", nil, UTF16BE},              //file contain utf16 big endian without bom
+	{"test_files\\utf16le-wBOM.txt", "", nil, UTF16LE},               //file contain utf16 little endian with bom
+	{"test_files\\utf16le-woBOM.txt", "", nil, UTF16LE},              //file contain utf16 little endian without bom
+	{"test_files\\utf32be-wBOM.txt", "", nil, UTF32BE},               //file contain utf32 big endian with bom
+	{"test_files\\utf32be-woBOM.txt", "", nil, UTF32BE},              //file contain utf32 big endian without bom
+	{"test_files\\utf32le-wBOM.txt", "", nil, UTF32LE},               //file contain utf32 little endian with bom
+	{"test_files\\utf32le-woBOM.txt", "", nil, UTF32LE},              //file contain utf32 little endian without bom
+	{"test_files\\Win1251.txt", "", nil, CP1251},                     //file contain Windows1251
+	{"test_files\\win1251_upper.txt", "", nil, CP1251},               //file contain Windows1251
 }
 
 //FileCodePageDetect
@@ -84,7 +84,6 @@ func TestFileCodePageDetect(t *testing.T) {
 	if err == nil {
 		t.Errorf("<FileCodePageDetect> on file '' must return error, but return nil")
 	}
-
 }
 
 //TestCodePageDetect - тестирование метода CodePageDetect
@@ -92,15 +91,15 @@ func TestFileCodePageDetect(t *testing.T) {
 // 1. nil		входящий поток явный nil, параметр останова отсутствует
 // 2. nil, "~"	входящий поток явный nil, параметр останова присутствует
 // 3. входящий поток не инициализированный объект, проверка на передачу пустого интерфейса
-// проверка работы осуществляется через FileCodePageDetect()
+// проверка самой работы осуществляется через FileCodePageDetect()
 func TestCodePageDetect(t *testing.T) {
-	_, err := CodePageDetect(nil)
-	if err == nil {
-		t.Errorf("<CodePageDetect> on input nil return error == nil, expect error != nil\n")
+	tmp, err := CodePageDetect(nil)
+	if (err != nil) && (tmp != ASCII) {
+		t.Errorf("<CodePageDetect> on input nil return error != nil or code page != ASCII\n")
 	}
-	_, err = CodePageDetect(nil, "~")
-	if err == nil {
-		t.Errorf("<CodePageDetect> on input nil return error == nil, expect error != nil\n")
+	tmp, err = CodePageDetect(nil, "~")
+	if (err != nil) && (tmp != ASCII) {
+		t.Errorf("<CodePageDetect> on input nil return error != nil or code page != ASCII\n")
 	}
 
 	var data *os.File

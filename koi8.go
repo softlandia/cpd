@@ -1,7 +1,5 @@
 package cpd
 
-import "unicode"
-
 //unit for koi-8
 
 var consonansKOI8 = [256]byte{
@@ -75,31 +73,6 @@ func matchRuneKOI8(d []byte, tbl *codePageTable) int {
 		}
 	}
 	return tbl.founded()
-}
-
-func runesMatchKOI8_2(data []byte, tbl *codePageTable) (counts int) {
-	for i := range data {
-		if i < 2 {
-			continue
-		}
-		//case " Us" - separator_UPPER_symbol
-		if unicode.IsPunct(rune(data[i-2])) && isUpperKOI8(data[i-1]) {
-			j := tbl.index(rune(data[i]))
-			if j > 0 {
-				(*tbl)[j].count++
-				counts++
-				continue
-			}
-		}
-		if isKOI8(data[i-1]) {
-			j := tbl.index(rune(data[i]))
-			if j > 0 {
-				(*tbl)[j].count++
-				counts++
-			}
-		}
-	}
-	return
 }
 
 const (

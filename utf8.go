@@ -87,10 +87,7 @@ func ValidUTF8(data []byte) bool {
 			return false
 		}
 	}
-	if float64(zerroByteCount)/float64(m) > 0.05 {
-		return false
-	}
-	return true
+	return float64(zerroByteCount)/float64(m) < 0.05
 }
 
 const (

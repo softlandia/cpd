@@ -16,7 +16,7 @@ func match866(data []byte, tbl *codePageTable) MatchRes {
 }
 
 const (
-	cp866BeginUpperChar  = 0x80
+	cp866StartUpperChar  = 0x80
 	cp866StopUpperChar   = 0x9F
 	cp866BeginLowerChar1 = 0xA0
 	cp866StopLowerChar1  = 0xAF
@@ -25,7 +25,7 @@ const (
 )
 
 func isUpper866(r byte) bool {
-	return (r >= cp866BeginUpperChar) && (r <= cp866StopUpperChar)
+	return (r >= cp866StartUpperChar) && (r <= cp866StopUpperChar)
 }
 
 func isLower866(r byte) bool {

@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"reflect"
 	"unicode"
 
 	"golang.org/x/text/encoding/charmap"
@@ -35,13 +34,13 @@ func FileCodePageDetect(fn string, stopStr ...string) (IDCodePage, error) {
 //CodePageDetect - detect code page of ascii data from reader 'r'
 func CodePageDetect(r io.Reader, stopStr ...string) (IDCodePage, error) {
 	//test input interfase
-	if !reflect.ValueOf(r).IsValid() {
-		return ASCII, fmt.Errorf("input reader is nil")
+	if r == nil {
+		return ASCII, nil
 	}
-
 	//make slice of byte from input reader
 	buf, err := bufio.NewReader(r).Peek(ReadBufSize)
-	if (err != nil) && (err.Error() != "EOF") {
+	//if (err != nil) && (err.Error() != "EOF") {
+	if (err != nil) && (err != io.EOF) {
 		return ASCII, err
 	}
 
