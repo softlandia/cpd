@@ -68,7 +68,7 @@ func ValidUTF8(data []byte) bool {
 			return false
 		}
 		i++
-		var j int32 = 1
+		var j int32
 		for j = 1; j < n; j++ {
 			//байты с данными должны иметь маску 10xx xxxx
 			if (data[i] & 0xC0) != 0x80 {

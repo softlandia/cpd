@@ -4,17 +4,14 @@ package cpd
 
 // for CP866 calculate only count of letter from table 'tbl'
 func match866(data []byte, tbl *codePageTable) MatchRes {
-	//	matches := 0
 	for i := range data {
 		j := tbl.index(rune(data[i])) //return 0 if rune data[i] not found
 		(*tbl)[j].count++
-		/*		if j > 0 {
-				matches++
-			}*/
 	}
 	return MatchRes{tbl.founded(), 0}
 }
 
+/*
 const (
 	cp866StartUpperChar  = 0x80
 	cp866StopUpperChar   = 0x9F
@@ -36,3 +33,4 @@ func isLower866(r byte) bool {
 func is866(r byte) bool {
 	return isUpper866(r) || isLower866(r)
 }
+*/
