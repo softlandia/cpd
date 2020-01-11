@@ -138,6 +138,7 @@ func (o TCodepagesDic) clear() {
 }
 
 //Match - return the id of code page to which the data best matches
+//TODO большинству матчеров требуется более 2х символов, надо проверить на минимальную длину
 func (o TCodepagesDic) Match(data []byte) (result IDCodePage) {
 	result = ASCII
 	maxCount := 0

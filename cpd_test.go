@@ -98,7 +98,7 @@ func TestCodePageDetect(t *testing.T) {
 	assert.Equal(t, tmp, ASCII, fmt.Sprintf("<CodePageDetect> on input nil return code page != ASCII\n"))
 
 	var data *os.File
-	res, err := CodePageDetect(data, "~")
+	res, err := CodePageDetect(data)
 	assert.NotNil(t, err, fmt.Sprintf("<CodePageDetect> on empty io.Reader return error != nil, data: %+v, err: %v\n", data, err))
 	assert.Equal(t, res, ASCII, fmt.Sprintf("<CodePageDetect> on empty io.Reader = %+v return code page %s != ASCII\n", data, res))
 

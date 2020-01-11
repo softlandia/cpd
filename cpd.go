@@ -62,7 +62,7 @@ func CodePageDetect(r io.Reader, stopStr ...string) (IDCodePage, error) {
 
 //CodePageAutoDetect - auto detect code page of input content
 func CodePageAutoDetect(content []byte) (result IDCodePage) {
-	return CodepageDic.Match(content) //TODO большинству матчеров требуется более 2х символов, надо проверить на минимальную длину
+	return CodepageDic.Match(content) 
 }
 
 //FileConvertCodePage - replace code page text file from one to another
