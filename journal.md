@@ -7,6 +7,6 @@
 * add IDCodePage.StringHasBom(s string) bool - checks that the string s contains characters BOM matching this given codepage  
 * add IDCodePage.DeleteBom(s string) string - return string without prefix bom bytes
 
-### TODO ###
+### todo ###
 
    1 UTF16LE & UTF16BE not recognized correctly if file no contains russian characters
