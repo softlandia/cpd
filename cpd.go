@@ -4,10 +4,13 @@ package cpd
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"io"
 	"os"
 	"unicode"
+	"unicode/utf16"
+	"unicode/utf8"
 
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/transform"
@@ -39,7 +42,6 @@ func CodePageDetect(r io.Reader, stopStr ...string) (IDCodePage, error) {
 	}
 	//make slice of byte from input reader
 	buf, err := bufio.NewReader(r).Peek(ReadBufSize)
-	//if (err != nil) && (err.Error() != "EOF") {
 	if (err != nil) && (err != io.EOF) {
 		return ASCII, err
 	}
@@ -62,7 +64,7 @@ func CodePageDetect(r io.Reader, stopStr ...string) (IDCodePage, error) {
 
 //CodePageAutoDetect - auto detect code page of input content
 func CodePageAutoDetect(content []byte) (result IDCodePage) {
-	return CodepageDic.Match(content) 
+	return CodepageDic.Match(content)
 }
 
 //FileConvertCodePage - replace code page text file from one to another
@@ -152,5 +154,23 @@ func StrConvertCodePage(s string, fromCP, toCP IDCodePage) (string, error) {
 // CodePageAsString - return name of char set with id codepage
 // if codepage not exist - return ""
 func CodePageAsString(codepage IDCodePage) string {
-	return codePageName[codepage]
+	//return codePageName[codepage]
+	return CodepageDic[codepage].name
+}
+
+//DecodeUTF16 - decode slice of byte from UTF16 to UTF8
+func DecodeUTF16(b []byte) string {
+	if len(b)%2 != 0 {
+		return string(b)
+	}
+	u16s := make([]uint16, 1)
+	ret := &bytes.Buffer{}
+	b8buf := make([]byte, 4)
+	for i := 0; i < len(b); i += 2 {
+		u16s[0] = uint16(b[i]) + (uint16(b[i+1]) << 8)
+		r := utf16.Decode(u16s)
+		n := utf8.EncodeRune(b8buf, r[0])
+		ret.Write(b8buf[:n])
+	}
+	return ret.String()
 }

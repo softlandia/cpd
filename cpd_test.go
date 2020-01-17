@@ -10,6 +10,33 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type tStringHasBom struct {
+	id IDCodePage
+	s  string
+	r  bool
+}
+
+var dStringHasBom = []tStringHasBom{
+	{0, "", false},
+	{ASCII, "", false},
+	{CP866, "CP866", false},
+	{CP1251, string([]byte{0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), false},
+	{CP1251, string([]byte{0xff, 0xfe, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), false}, //contain UTF16LE bom, false because CP1251 have no bom
+	{UTF8, string([]byte{0xef, 0xbb, 0xbf, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), true},
+	{UTF8, string([]byte{0xef, 0xbb, 0xbe, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), false},
+	{UTF8, string([]byte{0xff, 0xbb, 0xbe, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), false},
+	{UTF16BE, string([]byte{0xfe, 0xff, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), true},
+	{UTF16LE, string([]byte{0xff, 0xfe, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), true},
+	{UTF32BE, string([]byte{0x00, 0x00, 0xfe, 0xff, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), true},
+	{UTF32LE, string([]byte{0xff, 0xfe, 0x00, 0x00, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), true},
+}
+
+func TestStringHasBom(t *testing.T) {
+	for i, v := range dStringHasBom {
+		assert.Equal(t, v.r, v.id.StringHasBom(v.s), fmt.Sprintf("test: %d, cp: %s", i, v.id))
+	}
+}
+
 type tCodePageAsString struct {
 	id IDCodePage
 	s  string
@@ -26,9 +53,14 @@ var dCodePageAsString = []tCodePageAsString{
 func TestCodePageAsString(t *testing.T) {
 	for i, v := range dCodePageAsString {
 		s := CodePageAsString(v.id)
-		if s != v.s {
-			t.Errorf("<CodePageAsString> on test: %d return: %s, expected: %s", i, s, v.s)
-		}
+		assert.Equal(t, v.s, s, fmt.Sprintf("<CodePageAsString> on test: %d return: %s, expected: %s", i, s, v.s))
+	}
+}
+
+func TestCodepageString(t *testing.T) {
+	for i, v := range dCodePageAsString {
+		s := fmt.Sprintf("%s", v.id)
+		assert.Equal(t, v.s, s, fmt.Sprintf("<CodePageAsString> on test: %d return: %s, expected: %s", i, s, v.s))
 	}
 }
 
@@ -40,6 +72,8 @@ type tFileCodePageDetectTest struct {
 }
 
 var dFileCodePageDetect = []tFileCodePageDetectTest{
+	{fp.Join("test_files/utf16be_las.txt"), "", nil, UTF16BE},                //file contain utf16 big endian with bom
+	{fp.Join("test_files/utf16le_las.txt"), "", nil, UTF16LE},                //file contain utf16 little endian without bom
 	{fp.Join("test_files/866&1251.txt"), "", nil, CP1251},                    //file contain more 1251 then 866
 	{fp.Join("test_files/empty_file.txt"), "", nil, UTF8},                    //file exist but empty, no error, return ASCII
 	{fp.Join("test_files/IBM866.txt"), "", nil, CP866},                       //file contain IBM866
@@ -93,6 +127,7 @@ func TestCodePageDetect(t *testing.T) {
 	tmp, err := CodePageDetect(nil)
 	assert.Nil(t, err, fmt.Sprintf("<CodePageDetect> on input nil return error != nil\n"))
 	assert.Equal(t, tmp, ASCII, fmt.Sprintf("<CodePageDetect> on input nil return code page != ASCII\n"))
+
 	tmp, err = CodePageDetect(nil, "~")
 	assert.Nil(t, err, fmt.Sprintf("<CodePageDetect> on input nil return error != nil\n"))
 	assert.Equal(t, tmp, ASCII, fmt.Sprintf("<CodePageDetect> on input nil return code page != ASCII\n"))

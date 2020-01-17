@@ -4,7 +4,7 @@ import "bytes"
 
 // Boms - byte oder mark - special bytes for
 var Boms = []struct {
-	bom []byte
+	Bom []byte
 	id  IDCodePage
 }{
 	{[]byte{0xef, 0xbb, 0xbf}, UTF8},
@@ -17,7 +17,7 @@ var Boms = []struct {
 //CheckBOM - check buffer for match to utf-8, utf-16le or utf-16be BOM
 func CheckBOM(buf []byte) (id IDCodePage, res bool) {
 	for _, b := range Boms {
-		if bytes.HasPrefix(buf, b.bom) {
+		if bytes.HasPrefix(buf, b.Bom) {
 			return b.id, true
 		}
 	}

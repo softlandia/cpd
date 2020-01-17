@@ -28,7 +28,8 @@ encoding is determined both by the presence of the bom attribute and by heuristi
 if file contain only latin symbols from first half of code page, this file detected as UTF-8  
 this is not a mistake, this is a completely correct statement
 
-on go vertion 1.12.6 add to exe 250 kB
+ATTANTION!  
+files without specification on UTF16le and UTF16be not containing the Russian alphabet are not recognized correctly
 
 ## dependences ##
 
