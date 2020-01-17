@@ -59,7 +59,7 @@ func TestCodePageAsString(t *testing.T) {
 
 func TestCodepageString(t *testing.T) {
 	for i, v := range dCodePageAsString {
-		s := fmt.Sprintf("%s", v.id)
+		s := v.id.String()
 		assert.Equal(t, v.s, s, fmt.Sprintf("<CodePageAsString> on test: %d return: %s, expected: %s", i, s, v.s))
 	}
 }

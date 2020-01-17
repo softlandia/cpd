@@ -73,7 +73,9 @@ ReadBufSize int = 1024 // count of byte to read from input reader by default
 
     func FileConvertCodePage(fileName string, fromCP, toCP IDCodePage) error    //convert code page file with "fileName", support Windows1251 & IBM866
 
-## tests ##
+## tests and static analiz ##
 
-coverage: 79% of statements  
+coverage: 89% of statements  
 folder "test_files" contain files for testing, do not remove/change/add if want support tests is work
+
+linter.md report from golangci-lint
