@@ -1,14 +1,44 @@
 package cpd
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+
+	"github.com/softlandia/xlib"
+)
 
 //unit for UTF16BE
 
-func matchUTF16BE(data []byte, tbl *codePageTable) MatchRes {
+func matchUTF16be(b []byte, tbl *codePageTable) MatchRes {
+	n := len(b)/2 - 1
+	if n <= 0 {
+		return MatchRes{0, 0}
+	}
+	//два критерия используется
+	//первый количество найденных русских букв
+	//второй количество найденных 0x00
+	//решающим является максимальный
+	return MatchRes{xlib.Max(matchUTF16beRu(b, tbl), matchUTF16beZerro(b)), 0}
+}
+
+// matchUTF16leZerro - вычисляет критерий по количеству нулевых байтов, текст набранный латинскими символами в колировке UTF16le будет вторым символом иметь 0x00
+func matchUTF16beZerro(b []byte) int {
+	zerroCount := 0
+	n := len(b)/2 - 1
+	for i := 0; i < n; i += 2 {
+		if b[i] == 0x00 {
+			zerroCount++
+		}
+	}
+	return zerroCount
+}
+
+// matchUTF16beRu - вычисляет критерий по количеству русских букв
+// tbl *codePageTable - передаётся не для нахождения кодировки, а для заполнения встречаемости популярных русских букв
+func matchUTF16beRu(data []byte, tbl *codePageTable) int {
 	matches := 0
 	n := len(data)/2 - 1
 	if n <= 0 {
-		return MatchRes{0, 0}
+		return 0
 	}
 	count04 := 0
 	for i := 0; i < n; i += 2 {
@@ -28,8 +58,20 @@ func matchUTF16BE(data []byte, tbl *codePageTable) MatchRes {
 	if count04 < matches {
 		matches = count04
 	}
-	return MatchRes{matches, 0}
+	return matches
 }
+
+/*func matchUTF16beFirstLessSecond(b []byte) int {
+	count := 0
+	n := len(b)/2 - 1
+	for i := 0; i < n; i += 2 {
+		//second byte of UTF16BE usually greate than first
+		if b[i] < b[i+1] {
+			count++
+		}
+	}
+	return count
+}*/
 
 const (
 	cpUTF16beBeginUpperChar = 0x0410

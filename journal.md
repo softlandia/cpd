@@ -10,3 +10,11 @@
 ### todo ###
 
    1 UTF16LE & UTF16BE not recognized correctly if file no contains russian characters
+_____________________________
+
+## ver 0.3.4 // 2020.01.17 ##
+
+* change recognition of UTF16LE and UTF16BE
+* add test for UTF16LE and UTF16BE without russian
+
+_____________________________

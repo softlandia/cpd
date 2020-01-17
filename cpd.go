@@ -154,7 +154,6 @@ func StrConvertCodePage(s string, fromCP, toCP IDCodePage) (string, error) {
 // CodePageAsString - return name of char set with id codepage
 // if codepage not exist - return ""
 func CodePageAsString(codepage IDCodePage) string {
-	//return codePageName[codepage]
 	return CodepageDic[codepage].name
 }
 

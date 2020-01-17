@@ -123,13 +123,13 @@ var CodepageDic = TCodepagesDic{
 			//о           е				а		    и			 н			  т			   с			р			в
 			{0xD0BE, 0}, {0xD0B5, 0}, {0xD0B0, 0}, {0xD0B8, 0}, {0xD0BD, 0}, {0xD182, 0}, {0xD181, 0}, {0xD180, 0}, {0xD0B2, 0},
 			{0xD09E, 0}, {0xD095, 0}, {0xD090, 0}, {0xD098, 0}, {0xD0AD, 0}, {0xD0A2, 0}, {0xD0A1, 0}, {0xD0A0, 0}, {0xD092, 0}}},
-	UTF16LE: {UTF16LE, "UTF-16LE", MatchRes{0, 0}, matchUTF16LE, []byte{0xff, 0xfe},
+	UTF16LE: {UTF16LE, "UTF-16LE", MatchRes{0, 0}, matchUTF16le, []byte{0xff, 0xfe},
 		codePageTable{
 			{0, 0},
 			//о           е				а		    и			 н			  т			   с			р			в
 			{0x3E04, 0}, {0x3504, 0}, {0x1004, 0}, {0x3804, 0}, {0x3D04, 0}, {0x4204, 0}, {0x4104, 0}, {0x4004, 0}, {0x3204, 0},
 			{0x1E04, 0}, {0x1504, 0}, {0x3004, 0}, {0x1804, 0}, {0x1D04, 0}, {0x2204, 0}, {0x2104, 0}, {0x2004, 0}, {0x1204, 0}}},
-	UTF16BE: {UTF16BE, "UTF-16BE", MatchRes{0, 0}, matchUTF16BE, []byte{0xfe, 0xff},
+	UTF16BE: {UTF16BE, "UTF-16BE", MatchRes{0, 0}, matchUTF16be, []byte{0xfe, 0xff},
 		codePageTable{
 			{0, 0},
 			//о           е				а		    и			 н			  т			   с			р			в

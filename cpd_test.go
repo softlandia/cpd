@@ -72,8 +72,10 @@ type tFileCodePageDetectTest struct {
 }
 
 var dFileCodePageDetect = []tFileCodePageDetectTest{
-	{fp.Join("test_files/utf16be_las.txt"), "", nil, UTF16BE},                //file contain utf16 big endian with bom
+	{fp.Join("test_files/utf16le-woBOM-no-ru.txt"), "", nil, UTF16LE},        //file contain utf16 little endian without bom
+	{fp.Join("test_files/utf16le-woBOM-only-latin.txt"), "", nil, UTF16LE},   //file contain utf16 little endian without bom
 	{fp.Join("test_files/utf16le_las.txt"), "", nil, UTF16LE},                //file contain utf16 little endian without bom
+	{fp.Join("test_files/utf16be_las.txt"), "", nil, UTF16BE},                //file contain utf16 big endian with bom
 	{fp.Join("test_files/866&1251.txt"), "", nil, CP1251},                    //file contain more 1251 then 866
 	{fp.Join("test_files/empty_file.txt"), "", nil, UTF8},                    //file exist but empty, no error, return ASCII
 	{fp.Join("test_files/IBM866.txt"), "", nil, CP866},                       //file contain IBM866
@@ -96,6 +98,8 @@ var dFileCodePageDetect = []tFileCodePageDetectTest{
 	{fp.Join("test_files/utf32le-woBOM.txt"), "", nil, UTF32LE},              //file contain utf32 little endian without bom
 	{fp.Join("test_files/Win1251.txt"), "", nil, CP1251},                     //file contain Windows1251
 	{fp.Join("test_files/win1251_upper.txt"), "", nil, CP1251},               //file contain Windows1251
+	{fp.Join("test_files/utf16be-woBOM-only-latin.txt"), "", nil, UTF16BE},   //file contain utf16 big endian with bom
+	{fp.Join("test_files/utf16be-woBOM-no-ru.txt"), "", nil, UTF16BE},        //file contain utf16 big endian with bom
 }
 
 //FileCodePageDetect
