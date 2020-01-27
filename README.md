@@ -33,7 +33,8 @@ this is not a mistake, this is a completely correct statement
 ## dependences ##
 
 >"golang.org/x/text/encoding/charmap"  
->"golang.org/x/text/transform"
+>"golang.org/x/text/transform"  
+>"github.com/softlandia/xlib"
 
 ## types ##
 
