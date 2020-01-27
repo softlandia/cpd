@@ -5,6 +5,7 @@ import (
 	"os"
 	fp "path/filepath"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -21,10 +22,10 @@ var dStringHasBom = []tStringHasBom{
 	{ASCII, "", false},
 	{CP866, "CP866", false},
 	{CP1251, string([]byte{0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), false},
-	{CP1251, string([]byte{0xff, 0xfe, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), false}, //contain UTF16LE bom, false because CP1251 have no bom
-	{UTF8, string([]byte{0xef, 0xbb, 0xbf, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), true},
-	{UTF8, string([]byte{0xef, 0xbb, 0xbe, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), false},
-	{UTF8, string([]byte{0xff, 0xbb, 0xbe, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), false},
+	{CP1251, string([]byte{0xff, 0xfe, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), false},     //contain UTF16LE bom, false because CP1251 have no bom
+	{UTF8, string([]byte{0xef, 0xbb, 0xbf, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), true},  //UTF8 with bom
+	{UTF8, string([]byte{0xef, 0xbb, 0xbe, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), false}, //UTF8 without bom
+	{UTF8, string([]byte{0xff, 0xbb, 0xbe, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), false}, //UTF8 without bom
 	{UTF16BE, string([]byte{0xfe, 0xff, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), true},
 	{UTF16LE, string([]byte{0xff, 0xfe, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), true},
 	{UTF32BE, string([]byte{0x00, 0x00, 0xfe, 0xff, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), true},
@@ -72,6 +73,7 @@ type tFileCodePageDetectTest struct {
 }
 
 var dFileCodePageDetect = []tFileCodePageDetectTest{
+	{fp.Join("test_files/utf16le-woBOM-only-ru.txt"), "", nil, UTF16LE},      //file contain utf16 little endian without bom
 	{fp.Join("test_files/utf16le-woBOM-no-ru.txt"), "", nil, UTF16LE},        //file contain utf16 little endian without bom
 	{fp.Join("test_files/utf16le-woBOM-only-latin.txt"), "", nil, UTF16LE},   //file contain utf16 little endian without bom
 	{fp.Join("test_files/utf16le_las.txt"), "", nil, UTF16LE},                //file contain utf16 little endian without bom
@@ -100,6 +102,7 @@ var dFileCodePageDetect = []tFileCodePageDetectTest{
 	{fp.Join("test_files/win1251_upper.txt"), "", nil, CP1251},               //file contain Windows1251
 	{fp.Join("test_files/utf16be-woBOM-only-latin.txt"), "", nil, UTF16BE},   //file contain utf16 big endian with bom
 	{fp.Join("test_files/utf16be-woBOM-no-ru.txt"), "", nil, UTF16BE},        //file contain utf16 big endian with bom
+	{fp.Join("test_files/utf16be-woBOM-only-ru.txt"), "", nil, UTF16BE},      //file contain utf16 big endian with bom
 }
 
 //FileCodePageDetect
@@ -120,6 +123,30 @@ func TestFileCodePageDetect(t *testing.T) {
 	_, err = FileCodePageDetect("") //file "" not exist
 	assert.NotNil(t, err, "<FileCodePageDetect> on file '' must return error, but return nil")
 }
+
+func fileCodepageDetect(wg *sync.WaitGroup, cp *[]IDCodePage, fileName string) {
+	defer wg.Done()
+	res, _ := FileCodePageDetect(fileName)
+	(*cp) = append((*cp), res)
+}
+
+/*
+func TestFileCodePageDetectM(t *testing.T) {
+	var (
+		res IDCodePage
+		cp  []IDCodePage
+		wg  sync.WaitGroup
+	)
+	cp = make([]IDCodePage, 0)
+	for _, d := range dFileCodePageDetect {
+		wg.Add(1)
+		go fileCodepageDetect(&wg, &cp, d.fn)
+	}
+	wg.Wait()
+	for i, d := range dFileCodePageDetect {
+		assert.Equal(t, cp[i], d.r, fmt.Sprintf("<FileCodePageDetect> on file '%s' expected result: %s, got: %s", d.fn, d.r, res))
+	}
+}*/
 
 //TestCodePageDetect - тестирование метода CodePageDetect
 // проверки на входные параметры:

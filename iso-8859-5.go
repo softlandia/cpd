@@ -2,13 +2,13 @@ package cpd
 
 //unit for ISO-8859-5
 
-func matchISO88595(d []byte, tbl *codePageTable) MatchRes {
+func matchISO88595(d []byte, tbl *cpTable) MatchRes {
 	for i := 0; i < len(d); i++ {
-		if isISO88595(rune(d[i])) {
+		if isISO88595(d[i]) {
 			upper := lu88595(d[i])
 			j := tbl.index(rune(d[i]))
 			(*tbl)[j].count++
-			for i++; (i < len(d)) && isISO88595(rune(d[i])); i++ {
+			for i++; (i < len(d)) && isISO88595(d[i]); i++ {
 				if upper >= lu88595(d[i]) {
 					j = tbl.index(rune(d[i]))
 					(*tbl)[j].count++
@@ -27,20 +27,20 @@ const (
 )
 
 func lu88595(r byte) (res int) {
-	if isUpperISO88595(rune(r)) {
+	if isUpperISO88595(r) {
 		res = 1
 	}
 	return
 }
 
-func isUpperISO88595(r rune) bool {
+func isUpperISO88595(r byte) bool {
 	return (r >= cpISO88595BeginUpperChar) && (r <= cpISO88595StopUpperChar)
 }
 
-func isLowerISO88595(r rune) bool {
+func isLowerISO88595(r byte) bool {
 	return (r >= cpISO88595BeginLowerChar) && (r <= cpISO88595StopLowerChar)
 }
 
-func isISO88595(r rune) bool {
+func isISO88595(r byte) bool {
 	return isUpperISO88595(r) || isLowerISO88595(r)
 }

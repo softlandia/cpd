@@ -42,7 +42,7 @@ var vowelsKOI8 = [256]byte{
 	/* F */ 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
 }
 
-func matchKOI8(d []byte, tbl *codePageTable) MatchRes {
+func matchKOI8(d []byte, tbl *cpTable) MatchRes {
 	return MatchRes{matchRuneKOI8(d, tbl), cvPairsKOI8(d)}
 }
 
@@ -58,7 +58,7 @@ func cvPairsKOI8(d []byte) (cvPairsCount int) {
 	return cvPairsCount
 }
 
-func matchRuneKOI8(d []byte, tbl *codePageTable) int {
+func matchRuneKOI8(d []byte, tbl *cpTable) int {
 	for i := 0; i < len(d); i++ {
 		if isKOI8(d[i]) {
 			upper := luKOI8(d[i])

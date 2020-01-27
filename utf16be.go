@@ -8,7 +8,7 @@ import (
 
 //unit for UTF16BE
 
-func matchUTF16be(b []byte, tbl *codePageTable) MatchRes {
+func matchUTF16be(b []byte, tbl *cpTable) MatchRes {
 	n := len(b)/2 - 1
 	if n <= 0 {
 		return MatchRes{0, 0}
@@ -34,7 +34,7 @@ func matchUTF16beZerro(b []byte) int {
 
 // matchUTF16beRu - вычисляет критерий по количеству русских букв
 // tbl *codePageTable - передаётся не для нахождения кодировки, а для заполнения встречаемости популярных русских букв
-func matchUTF16beRu(data []byte, tbl *codePageTable) int {
+func matchUTF16beRu(data []byte, tbl *cpTable) int {
 	matches := 0
 	n := len(data)/2 - 1
 	if n <= 0 {

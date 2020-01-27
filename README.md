@@ -21,15 +21,14 @@ no ID                Name		uint16
 9. UTF32LE:          "UTF-32LE",	1019
 10. UTF32BE:         "UTF-32BE",	1018
 
-
 ## feature ##
 
 encoding is determined both by the presence of the bom attribute and by heuristic  
 if file contain only latin symbols from first half of code page, this file detected as UTF-8  
 this is not a mistake, this is a completely correct statement
 
-ATTANTION!  
-files without specification on UTF16le and UTF16be not containing the Russian alphabet are not recognized correctly
+>__ATTANTION!__
+>library not support multithreading, I work...
 
 ## dependences ##
 

@@ -13,11 +13,15 @@ import (
 //проверка на BOM уже выполнена, в принимаемом массиве не BOM символов
 
 // matchUTF16le - функция вычисляет общий критерий для кодировки UTF16LE
-func matchUTF16le(b []byte, tbl *codePageTable) MatchRes {
+func matchUTF16le(b []byte, tbl *cpTable) MatchRes {
 	n := len(b)/2 - 1
 	if n <= 0 {
 		return MatchRes{0, 0}
 	}
+	//два критерия используется
+	//первый количество найденных русских букв
+	//второй количество найденных 0x00
+	//решающим является максимальный
 	return MatchRes{xlib.Max(matchUTF16leRu(b, tbl), matchUTF16leZerro(b)), 0}
 }
 
@@ -35,7 +39,7 @@ func matchUTF16leZerro(b []byte) int {
 
 // matchUTF16leRu - вычисляет критерий по количеству русских букв
 // tbl *codePageTable - передаётся не для нахождения кодировки, а для заполнения встречаемости популярных русских букв
-func matchUTF16leRu(b []byte, tbl *codePageTable) int {
+func matchUTF16leRu(b []byte, tbl *cpTable) int {
 	matches := 0
 	count04 := 0
 	n := len(b)/2 - 1

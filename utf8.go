@@ -4,7 +4,7 @@ import "encoding/binary"
 
 //unit for UTF8
 
-func matchUTF8(d []byte, tbl *codePageTable) MatchRes {
+func matchUTF8(d []byte, tbl *cpTable) MatchRes {
 	matches := 0
 	if len(d) <= 3 {
 		return MatchRes{matches, 0}

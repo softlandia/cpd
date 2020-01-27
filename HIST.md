@@ -18,3 +18,13 @@ _____________________________
 * add test for UTF16LE and UTF16BE without russian
 
 _____________________________
+
+## ver 0.3.5 // 2020.01.27 ##
+
+* minor updates
+
+### todo ###
+
+   1 test with multithreading __not__ pass, 
+
+_____________________________

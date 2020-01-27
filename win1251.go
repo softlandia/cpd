@@ -56,7 +56,7 @@ func cvPairs1251(d []byte) (cvPairsCount int) {
 }
 
 // matchRunes1251 - counts the number of characters that are the most popular letters of the Russian alphabet
-func matchRune1251(d []byte, tbl *codePageTable) int {
+func matchRune1251(d []byte, tbl *cpTable) int {
 	for i := 0; i < len(d); i++ {
 		if is1251(d[i]) {
 			upper := lu1251(d[i])
@@ -73,7 +73,7 @@ func matchRune1251(d []byte, tbl *codePageTable) int {
 	return tbl.founded()
 }
 
-func match1251(d []byte, tbl *codePageTable) MatchRes {
+func match1251(d []byte, tbl *cpTable) MatchRes {
 	return MatchRes{matchRune1251(d, tbl), cvPairs1251(d)}
 }
 
@@ -103,3 +103,39 @@ func isLower1251(r byte) bool {
 func is1251(r byte) bool {
 	return isUpper1251(r) || isLower1251(r)
 }
+
+/*var  = [66]byte{
+	0xE0, 0xC0, // 'а'
+	0xE1, 0xC1, // 'б'
+	0xE2, 0xC2, // 'в'
+	0xE3, 0xC3, // 'г'
+	0xE4, 0xC4, // 'д'
+	0xE5, 0xC5, // 'е'
+	0xB8, 0xA8, // 'ё'
+	0xE6, 0xC6, // 'ж'
+	0xE7, 0xC7, // 'з'
+	0xE8, 0xC8, // 'и'
+	0xE9, 0xC9, // 'й'
+	0xEA, 0xCA, // 'к'
+	0xEB, 0xCB, // 'л'
+	0xEC, 0xCC, // 'м'
+	0xED, 0xCD, // 'н'
+	0xEE, 0xCE, // 'о'
+	0xEF, 0xCF, // 'п'
+	0xF0, 0xD0, // 'р'
+	0xF1, 0xD1, // 'с'
+	0xF2, 0xD2, // 'т'
+	0xF3, 0xD3, // 'у'
+	0xF4, 0xD4, // 'ф'
+	0xF5, 0xD5, // 'х'
+	0xF6, 0xD6, // 'ц'
+	0xF7, 0xD7, // 'ч'
+	0xF8, 0xD8, // 'ш'
+	0xF9, 0xD9, // 'щ'
+	0xFA, 0xDA, // 'ъ'
+	0xFB, 0xDB, // 'ы'
+	0xFC, 0xDC, // 'ь'
+	0xFD, 0xDD, // 'э'
+	0xFE, 0xDE, // 'ю'
+	0xFF, 0xDF, // 'я'
+}*/

@@ -3,7 +3,7 @@ package cpd
 //UTF-32BE
 
 //первые 2 байта практически всегда меньше вторых 2 байтов
-func matchUTF32be(d []byte, tbl *codePageTable) MatchRes {
+func matchUTF32be(d []byte, tbl *cpTable) MatchRes {
 	zerroCounts := 0
 	for i := 0; i < len(d)-4; i += 4 {
 		if (int(d[i]) + int(d[i+1])) == 0 {
