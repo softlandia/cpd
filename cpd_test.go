@@ -87,9 +87,9 @@ var dFileCodePageDetect = []tFileCodePageDetectTest{
 	{fp.Join("test_files/noCodePage.txt"), "", nil, UTF8},                    //file contain rune only ASCII
 	{fp.Join("test_files/rune_encode_error.txt"), "", nil, ISOLatinCyrillic}, //file contain special rune -> encode error, but detect NO error
 	{fp.Join("test_files/rune_error_1251.txt"), "", nil, CP1251},             //file contain 1251 and special rune -> encode error, but detect NO error
-	{fp.Join("test_files/utf8.txt"), "", nil, UTF8},                          //file contain utf8 with out bom rune at start
-	{fp.Join("test_files/utf8-wBOM.txt"), "", nil, UTF8},                     //file contain utf8 with bom prefix
-	{fp.Join("test_files/utf8-woBOM.txt"), "", nil, UTF8},                    //file contain utf8 with out bom rune at start
+	{fp.Join("test_files/utf8.txt"), "", nil, UTF8},                          //file contain utf8 without bom
+	{fp.Join("test_files/utf8-wBOM.txt"), "", nil, UTF8},                     //file contain utf8 with bom
+	{fp.Join("test_files/utf8-woBOM.txt"), "", nil, UTF8},                    //file contain utf8 without bom
 	{fp.Join("test_files/utf16be-wBOM.txt"), "", nil, UTF16BE},               //file contain utf16 big endian with bom
 	{fp.Join("test_files/utf16be-woBOM.txt"), "", nil, UTF16BE},              //file contain utf16 big endian without bom
 	{fp.Join("test_files/utf16le-wBOM.txt"), "", nil, UTF16LE},               //file contain utf16 little endian with bom
@@ -198,23 +198,27 @@ func TestFileConvertCodePage(t *testing.T) {
 
 //ConvertCodePage
 func TestStrConvertCodePage(t *testing.T) {
-	b := []byte{0x91, 0xE2, 0xE0}
-	s, err := StrConvertCodePage(string(b), CP866, CP1251)
+	s, err := StrConvertCodePage(string([]byte{0x91, 0xE2, 0xE0}), CP866, CP1251)
 	assert.Nil(t, err, fmt.Sprintf("<StrConvertCodePage> on test 1 return err: %v unexpected nil", err))
-	b = []byte{0xD1, 0xF2, 0xF0}
-	assert.Equal(t, s, string(b), fmt.Sprintf("<StrConvertCodePage> on test CP866->CP1251 return string: %s, expected: 'Стр'", s))
+	assert.Equal(t, s, string([]byte{0xD1, 0xF2, 0xF0}), fmt.Sprintf("<StrConvertCodePage> on test CP866->CP1251 return string: %s, expected: 'Стр'", s))
 
-	b = []byte{0xFF, 0xC9, 0xB8}
-	s, err = StrConvertCodePage(string(b), CP1251, CP866)
+	s, err = StrConvertCodePage(string([]byte{0xFF, 0xC9, 0xB8}), CP1251, CP866)
 	assert.Nil(t, err, fmt.Sprintf("<StrConvertCodePage> on test CP1251->CP866 return unexpected err: %v", err))
-	b = []byte{0xEF, 0x89, 0xF1}
-	assert.Equal(t, s, string(b), fmt.Sprintf("<StrConvertCodePage> on test CP1251->CP866 return string: %s, expected: 'яЙё'", s))
+	assert.Equal(t, s, string([]byte{0xEF, 0x89, 0xF1}), fmt.Sprintf("<StrConvertCodePage> on test CP1251->CP866 return string: %s, expected: 'яЙё'", s))
 
 	s, err = StrConvertCodePage("", CP866, CP1251)
-	assert.Nil(t, err, fmt.Sprintf("<StrConvertCodePage> with empty input string must return ERROR nil, but retrurn: %v", err))
-	assert.Equal(t, s, "", fmt.Sprintf("<StrConvertCodePage> with empty input string must return empty, but retrurn: %s", err))
+	assert.Nil(t, err, fmt.Sprintf("<StrConvertCodePage> with empty input string must return ERROR nil, but return: %v", err))
+	assert.Equal(t, s, "", fmt.Sprintf("<StrConvertCodePage> with empty input string must return empty, but return: %s", err))
 
 	s, err = StrConvertCodePage("1234", CP866, CP866)
 	assert.Nil(t, err, fmt.Sprintf("<StrConvertCodePage> with equal fromCP and toCp must return nil, but retrurn: %v", err))
-	assert.Equal(t, s, "1234", fmt.Sprintf("<StrConvertCodePage> with equal fromCP and toCp must return input string, but retrurn: %s", s))
+	assert.Equal(t, s, "1234", fmt.Sprintf("<StrConvertCodePage> with equal fromCP and toCp must return input string, but return: %s", s))
+
+	s, err = StrConvertCodePage(string([]byte{0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), CP1251, UTF8)
+	assert.Nil(t, err, fmt.Sprintf("<StrConvertCodePage> from CP1251 to UTF expect nil, got: %v", err))
+	assert.Equal(t, s, "Россия", fmt.Sprintf("<StrConvertCodePage> '%s' wrong return from CP1251 to UTF string", s))
+
+	s, err = StrConvertCodePage(string([]byte{0x90, 0xAE, 0xE1, 0xE1, 0xA8, 0xEF}), CP866, UTF8)
+	assert.Nil(t, err, fmt.Sprintf("<StrConvertCodePage> from CP866 to UTF expect nil, got: %v", err))
+	assert.Equal(t, s, "Россия", fmt.Sprintf("<StrConvertCodePage> '%s' wrong return from CP866 to UTF string", s))
 }
