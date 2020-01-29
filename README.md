@@ -46,8 +46,10 @@ ReadBufSize int = 1024 // count of byte to read from input reader by default
 
 ## functions ##
 
-1. CodePageDetect(r io.Reader, stopStr ...string) (IDCodePage, error)
+1. CodePageDetect(r io.Reader) (IDCodePage, error)
 2. FileCodePageDetect(fn string, stopStr ...string) (IDCodePage, error)
+3. DecodeUTF16be(s string) string
+4. DecodeUTF16le(s string) string
 
 ## description ##
 
@@ -55,7 +57,7 @@ ReadBufSize int = 1024 // count of byte to read from input reader by default
       autodetect code page from input slice of byte
       use this function instead golang.org/x/net/html/charset.DetermineEncoding()
 
-    CodePageDetect(r io.Reader, stopStr ...string) (IDCodePage, error)
+    CodePageDetect(r io.Reader) (IDCodePage, error)
       detect code page of ascii data from reader 'r' 
       use library 'reflect' to check input reader
       default read only first 1024 byte from 'r' (var ReadBufSize to change this setting)
@@ -73,9 +75,13 @@ ReadBufSize int = 1024 // count of byte to read from input reader by default
 
     func FileConvertCodePage(fileName string, fromCP, toCP IDCodePage) error    //convert code page file with "fileName", support Windows1251 & IBM866
 
+    func DecodeUTF16be(s string) string // convert input string from UTF-16BE to Utf-8
+
+    func DecodeUTF16le(s string) string // convert input string from UTF-16LE to Utf-8
+
 ## tests and static analiz ##
 
-coverage: 89% of statements  
+coverage: 88% of statements  
 folder "test_files" contain files for testing, do not remove/change/add if want support tests is work
 
-linter.md report from golangci-lint
+file linter.md report from __golangci-lint__

@@ -22,10 +22,10 @@ var dStringHasBom = []tStringHasBom{
 	{ASCII, "", false},
 	{CP866, "CP866", false},
 	{CP1251, string([]byte{0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), false},
-	{CP1251, string([]byte{0xff, 0xfe, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), false},     //contain UTF16LE bom, false because CP1251 have no bom
-	{UTF8, string([]byte{0xef, 0xbb, 0xbf, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), true},  //UTF8 with bom
-	{UTF8, string([]byte{0xef, 0xbb, 0xbe, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), false}, //UTF8 without bom
-	{UTF8, string([]byte{0xff, 0xbb, 0xbe, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), false}, //UTF8 without bom
+	{CP1251, string([]byte{0xff, 0xfe, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), false},     // contain UTF16LE bom, false because CP1251 have no bom
+	{UTF8, string([]byte{0xef, 0xbb, 0xbf, 0xD0, 0x94, 0xD0, 0xB5, 0xD0, 0xB4}), true},  // Дед UTF8 with bom
+	{UTF8, string([]byte{0xef, 0xbb, 0xbe, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), false}, // UTF8 without bom
+	{UTF8, string([]byte{0xff, 0xbb, 0xbe, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), false}, // UTF8 without bom
 	{UTF16BE, string([]byte{0xfe, 0xff, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), true},
 	{UTF16LE, string([]byte{0xff, 0xfe, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), true},
 	{UTF32BE, string([]byte{0x00, 0x00, 0xfe, 0xff, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), true},
@@ -211,4 +211,40 @@ func TestStrConvertCodePage(t *testing.T) {
 	s, err = StrConvertCodepage(string([]byte{0x90, 0xAE, 0xE1, 0xE1, 0xA8, 0xEF}), CP866, UTF8)
 	assert.Nil(t, err, fmt.Sprintf("<StrConvertCodePage> from CP866 to UTF expect nil, got: %v", err))
 	assert.Equal(t, s, "Россия", fmt.Sprintf("<StrConvertCodePage> '%s' wrong return from CP866 to UTF string", s))
+}
+
+type tDecodeUTF16le struct {
+	iStr string
+	oStr string
+}
+
+var dDecodeUTF16le = []tDecodeUTF16le{
+	{"", ""}, // empty string
+	{"\xFF\xFE\x14\x04\x35\x04\x34\x04", "Дед"}, // UTF16le with BOM	1
+	{"\x14\x04\x35\x04\x34\x04", "Дед"},         // UTF16le w/o BOM		2
+}
+
+func TestDecodeUtf16le(t *testing.T) {
+	for i, d := range dDecodeUTF16le {
+		s := DecodeUTF16le(d.iStr)
+		assert.Equal(t, d.oStr, s, fmt.Sprintf("test #%d not pass", i))
+	}
+}
+
+type tDecodeUTF16be struct {
+	iStr string
+	oStr string
+}
+
+var dDecodeUTF16be = []tDecodeUTF16le{
+	{"", ""}, // empty string
+	{"\xFE\xFF\x04\x14\x04\x35\x04\x34", "Дед"}, // UTF16be with BOM	1
+	{"\x04\x14\x04\x35\x04\x34", "Дед"},         // UTF16be w/o BOM		2
+}
+
+func TestDecodeUtf16be(t *testing.T) {
+	for i, d := range dDecodeUTF16be {
+		s := DecodeUTF16be(d.iStr)
+		assert.Equal(t, d.oStr, s, fmt.Sprintf("test #%d not pass", i))
+	}
 }
