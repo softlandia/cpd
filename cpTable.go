@@ -15,12 +15,6 @@ func (t *cpTable) index(r rune) int {
 	return 0
 }
 
-func (t *cpTable) clear() {
-	for i := 0; i < len(t); i++ {
-		t[i].count = 0
-	}
-}
-
 // founded - calculates total number of matching
 func (t *cpTable) founded() (res int) {
 	//0 элемент исключён, он не содержит количество найденных букв
@@ -28,6 +22,12 @@ func (t *cpTable) founded() (res int) {
 		res += t[i].count
 	}
 	return
+}
+
+func (t *cpTable) clear() {
+	for i := 0; i < len(t); i++ {
+		t[i].count = 0
+	}
 }
 
 func (t *cpTable) sort() *cpTable {

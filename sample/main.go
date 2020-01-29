@@ -15,7 +15,7 @@ func main() {
 	var fl []string
 	FindFilesExt(&fl, ".\\", os.Args[1])
 	for _, fn := range fl {
-		t, _ := cpd.FileCodePageDetect(fn)
+		t, _ := cpd.FileCodepageDetect(fn)
 		fmt.Printf("file: \t`%s`\t`%s`\n", fn, t)
 	}
 }

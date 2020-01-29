@@ -2,27 +2,25 @@ package cpd
 
 import (
 	"encoding/binary"
-
-	"github.com/softlandia/xlib"
 )
 
 //unit for UTF16LE
+//проверка на BOM уже выполнена, в принимаемом массиве нет BOM символов
 
 //русские буквы в UTF16 имеют уникальные номера
 //определять кодировку UTF16 (как LE так и BE) нужно по внутреннему устройству, не по кодам русских букв
-//проверка на BOM уже выполнена, в принимаемом массиве не BOM символов
 
 // matchUTF16le - функция вычисляет общий критерий для кодировки UTF16LE
+// два критерия используется
+// первый количество найденных русских букв
+// второй количество найденных 0x00
+// решающим является максимальный
 func matchUTF16le(b []byte, tbl *cpTable) MatchRes {
 	n := len(b)/2 - 1
 	if n <= 0 {
 		return MatchRes{0, 0}
 	}
-	//два критерия используется
-	//первый количество найденных русских букв
-	//второй количество найденных 0x00
-	//решающим является максимальный
-	return MatchRes{xlib.Max(matchUTF16leRu(b, tbl), matchUTF16leZerro(b)), 0}
+	return MatchRes{max(matchUTF16leRu(b, tbl), matchUTF16leZerro(b)), 0}
 }
 
 // matchUTF16leZerro - вычисляет критерий по количеству нулевых байтов, текст набранный латинскими символами в колировке UTF16le будет вторым символом иметь 0x00
@@ -63,18 +61,6 @@ func matchUTF16leRu(b []byte, tbl *cpTable) int {
 	}
 	return matches
 }
-
-/*func matchUTF16leFirstGreateSecond(b []byte) int {
-	count := 0
-	n := len(b)/2 - 1
-	for i := 0; i < n; i += 2 {
-		//second byte of russian char is 0x04
-		if b[i] > b[i+1] {
-			count++
-		}
-	}
-	return count
-}*/
 
 const (
 	cpUTF16leBeginUpperChar = 0x1004

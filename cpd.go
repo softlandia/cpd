@@ -16,60 +16,47 @@ import (
 	"golang.org/x/text/transform"
 )
 
-//ReadBufSize - byte count for reading from file, func FileCodePageDetect()
+// ReadBufSize - byte count for reading from file, func FileCodePageDetect()
 var ReadBufSize int = 1024
 
-//FileCodePageDetect - detect code page of text file
-func FileCodePageDetect(fn string, stopStr ...string) (IDCodePage, error) {
+// FileCodepageDetect - detect code page of text file
+func FileCodepageDetect(fn string, stopStr ...string) (IDCodePage, error) {
 
 	iFile, err := os.Open(fn)
 	if err != nil {
 		return ASCII, err
 	}
 	defer iFile.Close()
-
-	if len(stopStr) > 0 {
-		return CodePageDetect(iFile, stopStr[0])
-	}
-	return CodePageDetect(iFile)
+	return CodepageDetect(iFile)
 }
 
-//CodePageDetect - detect code page of ascii data from reader 'r'
-func CodePageDetect(r io.Reader, stopStr ...string) (IDCodePage, error) {
-	//test input interfase
+// CodepageDetect - detect code page of ascii data from reader 'r'
+func CodepageDetect(r io.Reader) (IDCodePage, error) {
 	if r == nil {
 		return ASCII, nil
 	}
-	//make slice of byte from input reader
 	buf, err := bufio.NewReader(r).Peek(ReadBufSize)
 	if (err != nil) && (err != io.EOF) {
 		return ASCII, err
 	}
-
-	//clear all counts and matching result
-	//CodepageDic - global var and need cleaning befor reuse
-	CodepageDic.clear()
-
 	//match code page from BOM, support: utf-8, utf-16le, utf-16be, utf-32le or utf-32be
 	if idCodePage, ok := CheckBOM(buf); ok {
 		return idCodePage, nil
 	}
-
 	if ValidUTF8(buf) {
 		return UTF8, nil
 	}
-
-	return CodePageAutoDetect(buf), nil
+	return CodepageAutoDetect(buf), nil
 }
 
-//CodePageAutoDetect - auto detect code page of input content
-func CodePageAutoDetect(content []byte) (result IDCodePage) {
-	return CodepageDic.Match(content)
+// CodepageAutoDetect - auto detect code page of input content
+func CodepageAutoDetect(b []byte) IDCodePage {
+	return NewCodepageDic().Match(b)
 }
 
-//FileConvertCodePage - replace code page text file from one to another
+// FileConvertCodepage - replace code page text file from one to another
 // support convert only from/to Windows1251/IBM866
-func FileConvertCodePage(fileName string, fromCP, toCP IDCodePage) error {
+func FileConvertCodepage(fileName string, fromCP, toCP IDCodePage) error {
 	if fromCP == toCP {
 		return nil
 	}
@@ -100,7 +87,7 @@ func FileConvertCodePage(fileName string, fromCP, toCP IDCodePage) error {
 	iScanner := bufio.NewScanner(iFile)
 	for i := 0; iScanner.Scan(); i++ {
 		s = iScanner.Text()
-		s, err = StrConvertCodePage(s, fromCP, toCP)
+		s, err = StrConvertCodepage(s, fromCP, toCP)
 		if err != nil {
 			oFile.Close()
 			os.Remove(tmpFileName)
@@ -113,20 +100,37 @@ func FileConvertCodePage(fileName string, fromCP, toCP IDCodePage) error {
 	return os.Rename(tmpFileName, fileName)
 }
 
-//ToUTF8 -
-//TODO need realization
-func ToUTF8(s string) string {
-	return s
-}
-
 //IsSeparator - return true if input rune is SPACE or PUNCT
 func IsSeparator(r rune) bool {
 	return unicode.IsPunct(r) || unicode.IsSpace(r)
 }
 
-//StrConvertCodePage - convert string from one code page to another
+// CodepageAsString - return name of char set with id codepage
+// if codepage not exist - return ""
+func CodepageAsString(codepage IDCodePage) string {
+	return codepageDic[codepage].name
+}
+
+//DecodeUTF16 - decode slice of byte from UTF16 to UTF8
+func DecodeUTF16(b []byte) string {
+	if len(b)%2 != 0 {
+		return string(b)
+	}
+	u16s := make([]uint16, 1)
+	ret := &bytes.Buffer{}
+	b8buf := make([]byte, 4)
+	for i := 0; i < len(b); i += 2 {
+		u16s[0] = uint16(b[i]) + (uint16(b[i+1]) << 8)
+		r := utf16.Decode(u16s)
+		n := utf8.EncodeRune(b8buf, r[0])
+		ret.Write(b8buf[:n])
+	}
+	return ret.String()
+}
+
+// StrConvertCodepage - convert string from one code page to another
 // function for future, at now support convert only from/to Windows1251/IBM866
-func StrConvertCodePage(s string, fromCP, toCP IDCodePage) (string, error) {
+func StrConvertCodepage(s string, fromCP, toCP IDCodePage) (string, error) {
 	if len(s) == 0 {
 		return "", nil
 	}
@@ -149,27 +153,4 @@ func StrConvertCodePage(s string, fromCP, toCP IDCodePage) (string, error) {
 		s, _, err = transform.String(charmap.Windows1251.NewEncoder(), s)
 	}
 	return s, err
-}
-
-// CodePageAsString - return name of char set with id codepage
-// if codepage not exist - return ""
-func CodePageAsString(codepage IDCodePage) string {
-	return CodepageDic[codepage].name
-}
-
-//DecodeUTF16 - decode slice of byte from UTF16 to UTF8
-func DecodeUTF16(b []byte) string {
-	if len(b)%2 != 0 {
-		return string(b)
-	}
-	u16s := make([]uint16, 1)
-	ret := &bytes.Buffer{}
-	b8buf := make([]byte, 4)
-	for i := 0; i < len(b); i += 2 {
-		u16s[0] = uint16(b[i]) + (uint16(b[i+1]) << 8)
-		r := utf16.Decode(u16s)
-		n := utf8.EncodeRune(b8buf, r[0])
-		ret.Write(b8buf[:n])
-	}
-	return ret.String()
 }

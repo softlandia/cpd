@@ -53,7 +53,7 @@ var dCodePageAsString = []tCodePageAsString{
 
 func TestCodePageAsString(t *testing.T) {
 	for i, v := range dCodePageAsString {
-		s := CodePageAsString(v.id)
+		s := CodepageAsString(v.id)
 		assert.Equal(t, v.s, s, fmt.Sprintf("<CodePageAsString> on test: %d return: %s, expected: %s", i, s, v.s))
 	}
 }
@@ -67,7 +67,7 @@ func TestCodepageString(t *testing.T) {
 
 type tFileCodePageDetectTest struct {
 	fn string     //filename
-	st string     //stop string
+	st string     //stop string, not using now
 	e  error      //
 	r  IDCodePage //expected result
 }
@@ -100,9 +100,11 @@ var dFileCodePageDetect = []tFileCodePageDetectTest{
 	{fp.Join("test_files/utf32le-woBOM.txt"), "", nil, UTF32LE},              //file contain utf32 little endian without bom
 	{fp.Join("test_files/Win1251.txt"), "", nil, CP1251},                     //file contain Windows1251
 	{fp.Join("test_files/win1251_upper.txt"), "", nil, CP1251},               //file contain Windows1251
-	{fp.Join("test_files/utf16be-woBOM-only-latin.txt"), "", nil, UTF16BE},   //file contain utf16 big endian with bom
-	{fp.Join("test_files/utf16be-woBOM-no-ru.txt"), "", nil, UTF16BE},        //file contain utf16 big endian with bom
-	{fp.Join("test_files/utf16be-woBOM-only-ru.txt"), "", nil, UTF16BE},      //file contain utf16 big endian with bom
+	{fp.Join("test_files/utf16be-woBOM-only-latin.txt"), "", nil, UTF16BE},   //file contain utf16be with bom
+	{fp.Join("test_files/utf16be-woBOM-no-ru.txt"), "", nil, UTF16BE},        //file contain utf16be with bom
+	{fp.Join("test_files/utf16be-woBOM-only-ru.txt"), "", nil, UTF16BE},      //file contain utf16be with bom
+	{fp.Join("test_files/utf32be-ascii-no-ru.txt"), "", nil, UTF16BE},        //file contain utf32be w/o bom w/o ru, detected as UTF16BE
+	{fp.Join("test_files/utf32le-ascii-no-ru.txt"), "", nil, UTF16LE},        //file contain utf32le w/o bom w/o ru, detected as UTF16LE
 }
 
 //FileCodePageDetect
@@ -112,41 +114,33 @@ func TestFileCodePageDetect(t *testing.T) {
 		res IDCodePage
 	)
 	for _, d := range dFileCodePageDetect {
-		res, err = FileCodePageDetect(d.fn)
+		res, err = FileCodepageDetect(d.fn)
 		assert.Equal(t, err, d.e, fmt.Sprintf("<FileCodePageDetect> on file '%s' expected error:  '%v', got: '%v', ", d.fn, d.e, err))
 		assert.Equal(t, res, d.r, fmt.Sprintf("<FileCodePageDetect> on file '%s' expected result: %s, got: %s", d.fn, d.r, res))
 	}
 
-	_, err = FileCodePageDetect("-.-") //file "-.-" not exist
+	_, err = FileCodepageDetect("-.-") //file "-.-" not exist
 	assert.NotNil(t, err, "<FileCodePageDetect> on file '-.-' must return error, but return nil")
 
-	_, err = FileCodePageDetect("") //file "" not exist
+	_, err = FileCodepageDetect("") //file "" not exist
 	assert.NotNil(t, err, "<FileCodePageDetect> on file '' must return error, but return nil")
 }
 
-func fileCodepageDetect(wg *sync.WaitGroup, cp *[]IDCodePage, fileName string) {
+func fileCodepageDetect(wg *sync.WaitGroup, t *testing.T, trusted IDCodePage, f string) {
 	defer wg.Done()
-	res, _ := FileCodePageDetect(fileName)
-	(*cp) = append((*cp), res)
+	res, _ := FileCodepageDetect(f)
+	assert.Equal(t, trusted, res, fmt.Sprintf("<FileCodePageDetect> on file '%s' expected: %s, got: %s", f, trusted, res))
 }
 
-/*
+//тестирование в многопоточном режиме
 func TestFileCodePageDetectM(t *testing.T) {
-	var (
-		res IDCodePage
-		cp  []IDCodePage
-		wg  sync.WaitGroup
-	)
-	cp = make([]IDCodePage, 0)
+	var wg sync.WaitGroup
 	for _, d := range dFileCodePageDetect {
 		wg.Add(1)
-		go fileCodepageDetect(&wg, &cp, d.fn)
+		go fileCodepageDetect(&wg, t, d.r, d.fn)
 	}
 	wg.Wait()
-	for i, d := range dFileCodePageDetect {
-		assert.Equal(t, cp[i], d.r, fmt.Sprintf("<FileCodePageDetect> on file '%s' expected result: %s, got: %s", d.fn, d.r, res))
-	}
-}*/
+}
 
 //TestCodePageDetect - тестирование метода CodePageDetect
 // проверки на входные параметры:
@@ -155,70 +149,66 @@ func TestFileCodePageDetectM(t *testing.T) {
 // 3. входящий поток не инициализированный объект, проверка на передачу пустого интерфейса
 // проверка самой работы осуществляется через FileCodePageDetect()
 func TestCodePageDetect(t *testing.T) {
-	tmp, err := CodePageDetect(nil)
-	assert.Nil(t, err, fmt.Sprintf("<CodePageDetect> on input nil return error != nil\n"))
-	assert.Equal(t, tmp, ASCII, fmt.Sprintf("<CodePageDetect> on input nil return code page != ASCII\n"))
-
-	tmp, err = CodePageDetect(nil, "~")
+	tmp, err := CodepageDetect(nil)
 	assert.Nil(t, err, fmt.Sprintf("<CodePageDetect> on input nil return error != nil\n"))
 	assert.Equal(t, tmp, ASCII, fmt.Sprintf("<CodePageDetect> on input nil return code page != ASCII\n"))
 
 	var data *os.File
-	res, err := CodePageDetect(data)
+	res, err := CodepageDetect(data)
 	assert.NotNil(t, err, fmt.Sprintf("<CodePageDetect> on empty io.Reader return error != nil, data: %+v, err: %v\n", data, err))
 	assert.Equal(t, res, ASCII, fmt.Sprintf("<CodePageDetect> on empty io.Reader = %+v return code page %s != ASCII\n", data, res))
 
-	res, err = CodePageDetect(strings.NewReader(""))
+	res, err = CodepageDetect(strings.NewReader(""))
 	assert.Nil(t, err, fmt.Sprintf("<CodePageDetect> on input \"\" return error: %v, expected nil\n", err))
 	assert.Equal(t, res, UTF8, fmt.Sprintf("<CodePageDetect> on input \"\" return %s, expected ASCII\n", res))
 }
 
 //FileConvertCodePage
 func TestFileConvertCodePage(t *testing.T) {
-	err := FileConvertCodePage("", CP866, CP1251)
+	err := FileConvertCodepage("", CP866, CP1251)
 	assert.NotNil(t, err, fmt.Sprintf("<FileConvertCodePage> on empty file name expected error, got: %v", err))
 
-	err = FileConvertCodePage("", CP866, CP866)
+	err = FileConvertCodepage("", CP866, CP866)
 	assert.Nil(t, err, fmt.Sprintf("<FileConvertCodePage> on fromCp == toCp expected error==nil, got: %v", err))
 
-	err = FileConvertCodePage("123", UTF8, CP866)
+	err = FileConvertCodepage("123", UTF8, CP866)
 	assert.Nil(t, err, fmt.Sprintf("<FileConvertCodePage> on fromCp or toCp not Windows1251 or IBM866 expected error == nil, got: %v", err))
 
-	err = FileConvertCodePage("123", CP866, UTF16LE)
+	err = FileConvertCodepage("123", CP866, UTF16LE)
 	assert.Nil(t, err, fmt.Sprintf("<FileConvertCodePage> on fromCp or toCp not Windows1251 or IBM866 expected error == nil, got: %v", err))
 
-	err = FileConvertCodePage(fp.Join("test_files/rune_encode_error.txt"), CP866, CP1251)
+	err = FileConvertCodepage(fp.Join("test_files/rune_encode_error.txt"), CP866, CP1251)
 	assert.NotNil(t, err, fmt.Sprintf("<FileConvertCodePage> expected error, got: %v", err))
 
 	os.Link(fp.Join("test_files/866to1251.txt"), fp.Join("test_files/866to1251.tmp"))
-	err = FileConvertCodePage(fp.Join("test_files/866to1251.tmp"), CP866, CP1251)
+	err = FileConvertCodepage(fp.Join("test_files/866to1251.tmp"), CP866, CP1251)
 	assert.Nil(t, err, fmt.Sprintf("<FileConvertCodePage> expect no err, got: %v", err))
 	os.Remove(fp.Join("test_files/866to1251.tmp"))
 }
 
 //ConvertCodePage
 func TestStrConvertCodePage(t *testing.T) {
-	s, err := StrConvertCodePage(string([]byte{0x91, 0xE2, 0xE0}), CP866, CP1251)
+	s, err := StrConvertCodepage(string([]byte{0x91, 0xE2, 0xE0}), CP866, CP1251)
 	assert.Nil(t, err, fmt.Sprintf("<StrConvertCodePage> on test 1 return err: %v unexpected nil", err))
 	assert.Equal(t, s, string([]byte{0xD1, 0xF2, 0xF0}), fmt.Sprintf("<StrConvertCodePage> on test CP866->CP1251 return string: %s, expected: 'Стр'", s))
 
-	s, err = StrConvertCodePage(string([]byte{0xFF, 0xC9, 0xB8}), CP1251, CP866)
+	s, err = StrConvertCodepage(string([]byte{0xFF, 0xC9, 0xB8}), CP1251, CP866)
 	assert.Nil(t, err, fmt.Sprintf("<StrConvertCodePage> on test CP1251->CP866 return unexpected err: %v", err))
 	assert.Equal(t, s, string([]byte{0xEF, 0x89, 0xF1}), fmt.Sprintf("<StrConvertCodePage> on test CP1251->CP866 return string: %s, expected: 'яЙё'", s))
 
-	s, err = StrConvertCodePage("", CP866, CP1251)
+	s, err = StrConvertCodepage("", CP866, CP1251)
 	assert.Nil(t, err, fmt.Sprintf("<StrConvertCodePage> with empty input string must return ERROR nil, but return: %v", err))
 	assert.Equal(t, s, "", fmt.Sprintf("<StrConvertCodePage> with empty input string must return empty, but return: %s", err))
 
-	s, err = StrConvertCodePage("1234", CP866, CP866)
+	s, err = StrConvertCodepage("1234", CP866, CP866)
 	assert.Nil(t, err, fmt.Sprintf("<StrConvertCodePage> with equal fromCP and toCp must return nil, but retrurn: %v", err))
 	assert.Equal(t, s, "1234", fmt.Sprintf("<StrConvertCodePage> with equal fromCP and toCp must return input string, but return: %s", s))
 
-	s, err = StrConvertCodePage(string([]byte{0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), CP1251, UTF8)
+	s, err = StrConvertCodepage(string([]byte{0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), CP1251, UTF8)
 	assert.Nil(t, err, fmt.Sprintf("<StrConvertCodePage> from CP1251 to UTF expect nil, got: %v", err))
 	assert.Equal(t, s, "Россия", fmt.Sprintf("<StrConvertCodePage> '%s' wrong return from CP1251 to UTF string", s))
 
-	s, err = StrConvertCodePage(string([]byte{0x90, 0xAE, 0xE1, 0xE1, 0xA8, 0xEF}), CP866, UTF8)
+	s, err = StrConvertCodepage(string([]byte{0x90, 0xAE, 0xE1, 0xE1, 0xA8, 0xEF}), CP866, UTF8)
 	assert.Nil(t, err, fmt.Sprintf("<StrConvertCodePage> from CP866 to UTF expect nil, got: %v", err))
 	assert.Equal(t, s, "Россия", fmt.Sprintf("<StrConvertCodePage> '%s' wrong return from CP866 to UTF string", s))
 }

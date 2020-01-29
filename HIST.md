@@ -9,7 +9,7 @@
 
 ### todo ###
 
-   1 UTF16LE & UTF16BE not recognized correctly if file no contains russian characters
+   - UTF16LE & UTF16BE not recognized correctly if file no contains russian characters
 _____________________________
 
 ## ver 0.3.4 // 2020.01.17 ##
@@ -25,6 +25,19 @@ _____________________________
 
 ### todo ###
 
-   1 test with multithreading __not__ pass, 
+   - test with multithreading __not__ pass, 
+
+_____________________________
+
+## ver 0.4.0 // 2020.01.29 ##
+
+* multithreading support updates
+* add multithreading tests
+* rename exported functions
+* hide global var CodepageDic from export, rename to codepageDic
+
+### todo ###
+
+   - string UTF32 w/o bom and w/o russian char detect as UTF16
 
 _____________________________

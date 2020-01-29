@@ -2,8 +2,6 @@ package cpd
 
 import (
 	"encoding/binary"
-
-	"github.com/softlandia/xlib"
 )
 
 //unit for UTF16BE
@@ -17,7 +15,7 @@ func matchUTF16be(b []byte, tbl *cpTable) MatchRes {
 	//первый количество найденных русских букв
 	//второй количество найденных 0x00
 	//решающим является максимальный
-	return MatchRes{xlib.Max(matchUTF16beRu(b, tbl), matchUTF16beZerro(b)), 0}
+	return MatchRes{max(matchUTF16beRu(b, tbl), matchUTF16beZerro(b)), 0}
 }
 
 // matchUTF16leZerro - вычисляет критерий по количеству нулевых байтов, текст набранный латинскими символами в колировке UTF16le будет вторым символом иметь 0x00

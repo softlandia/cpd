@@ -25,16 +25,16 @@ no ID                Name		uint16
 
 encoding is determined both by the presence of the bom attribute and by heuristic  
 if file contain only latin symbols from first half of code page, this file detected as UTF-8  
-this is not a mistake, this is a completely correct statement
+this is not a mistake, this is a completely correct statement  
+have touble with detecting UTF32 without russians char
 
 >__ATTANTION!__
->library not support multithreading, I work...
+>library __support__ multithreading
 
 ## dependences ##
 
 >"golang.org/x/text/encoding/charmap"  
 >"golang.org/x/text/transform"  
->"github.com/softlandia/xlib"
 
 ## types ##
 

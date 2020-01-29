@@ -108,3 +108,8 @@ func isLowerUTF8(r rune) bool {
 func isUTF8(r rune) bool {
 	return isUpperUTF8(r) || isLowerUTF8(r)
 }
+
+//TODO need realization
+func toUTF8(s string) string {
+	return s
+}
