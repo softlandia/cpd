@@ -95,7 +95,7 @@ ReadBufSize int = 1024 // default count of byte to read from input reader for de
       encode input reader to specified enconding
       input data ONLY in UTF-8
 
-## tests and static analiz ##
+## tests and static analysis ##
 
 coverage: 89.8%  
 folder "test_files" contain files for testing, do not remove/change/add if want support tests is work
