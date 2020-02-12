@@ -98,7 +98,7 @@ ReadBufSize int = 1024 // default count of byte to read from input reader for de
 ## tests and static analysis ##
 
 coverage: 89.8%  
-folder "test_files" contain files for testing, do not remove/change/add if want support tests is work
+folder "test_files" contain files for testing, do not remove/change/add if want support tests is work  
 folder sample contain:
 
 1. tohex -- encode the input string to the specified encoding and return the string from the hexadecimal code of the received runes
