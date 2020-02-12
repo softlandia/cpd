@@ -57,6 +57,7 @@ func (i IDCodePage) ReaderHasBom(r io.Reader) bool {
 // DeleteBomFromReader - return reader after removing BOM from it
 func (i IDCodePage) DeleteBomFromReader(r io.Reader) io.Reader {
 	if i.ReaderHasBom(r) {
+		//ошибку не обрабатываем, если мы здесь, то эти байты мы уже читали
 		r.Read(make([]byte, UTF8.BomLen())) // считываем в никуда количество байт занимаемых BOM этой кодировки
 	}
 	return r

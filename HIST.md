@@ -52,3 +52,13 @@ _____________________________
    - string UTF32 w/o bom and w/o russian char detect as UTF16
 
 _____________________________
+
+## ver 0.5.1 // 2020.02.13 ##
+
+* rename function NewReaderCP() to NewReaderTo()
+* add tests
+* add samples
+
+### todo ###
+
+   - string UTF32 w/o bom and w/o russian char detect as UTF16

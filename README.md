@@ -42,28 +42,31 @@ IDCodePage uint16 - index of code page, support String() interface, you can fmt.
 
 ## variables ##
 
-ReadBufSize int = 1024 // count of byte to read from input reader by default
+ReadBufSize int = 1024 // default count of byte to read from input reader for detecting  
 
 ## functions ##
 
-1. CodePageDetect(r io.Reader) (IDCodePage, error)
-2. FileCodePageDetect(fn string, stopStr ...string) (IDCodePage, error)
+1. CodepageDetect(r io.Reader) (IDCodePage, error)
+2. FileCodepageDetect(fn string, stopStr ...string) (IDCodePage, error)
 3. DecodeUTF16be(s string) string
 4. DecodeUTF16le(s string) string
+5. NewReader(r io.Reader, cpn ...string) (io.Reader, error)
+6. NewReaderTo(r io.Reader, cpn string) (io.Reader, error)
+7. CodepageAutoDetect(content []byte) (result IDCodePage)
 
 ## description ##
 
-    func CodePageAutoDetect(content []byte) (result IDCodePage) 
+    func CodepageAutoDetect(content []byte) (result IDCodePage) 
       autodetect code page from input slice of byte
       use this function instead golang.org/x/net/html/charset.DetermineEncoding()
 
-    CodePageDetect(r io.Reader) (IDCodePage, error)
+    CodepageDetect(r io.Reader) (IDCodePage, error)
       detect code page of ascii data from reader 'r' 
       use library 'reflect' to check input reader
       default read only first 1024 byte from 'r' (var ReadBufSize to change this setting)
       input parameter stopStr not using
 
-    FileCodePageDetect(fn string, stopStr ...string) (IDCodePage, error)
+    FileCodepageDetect(fn string, stopStr ...string) (IDCodePage, error)
       detect code page of text file "fn", read first 1024 byte (var ReadBufSize to change this setting)
       return error if problem with file "fn"
       return cpd.ASCII if code page not detected
@@ -71,17 +74,35 @@ ReadBufSize int = 1024 // count of byte to read from input reader by default
       file must contain characters of the Rusian alphabet
       string stopStr now not using
 
-    func StrConvertCodePage(s string, fromCP, toCP IDCodePage) (string, error)  //convert string from one code page to another, support Windows1251 & IBM866
+    func StrConvertCodePage(s string, fromCP, toCP IDCodePage) (string, error)  
+      convert string from one code page to another, support Windows1251 & IBM866
 
-    func FileConvertCodePage(fileName string, fromCP, toCP IDCodePage) error    //convert code page file with "fileName", support Windows1251 & IBM866
+    func FileConvertCodePage(fileName string, fromCP, toCP IDCodePage) error
+      convert code page file with "fileName", support Windows1251 & IBM866
 
-    func DecodeUTF16be(s string) string // convert input string from UTF-16BE to Utf-8
+    func DecodeUTF16be(s string) string 
+      convert input string from UTF-16BE to Utf-8
 
-    func DecodeUTF16le(s string) string // convert input string from UTF-16LE to Utf-8
+    func DecodeUTF16le(s string) string 
+      convert input string from UTF-16LE to Utf-8
+
+    NewReader(r io.Reader, cpn ...string) (io.Reader, error)
+      decoding input reader in UTF-8
+      cpn may contain the name of the encoding of the input data, 
+      we can ommit cpn, then the encoding of the input data is determined automatically
+
+    NewReaderTo(r io.Reader) io.Reader
+      encode input reader to specified enconding
+      input data ONLY in UTF-8
 
 ## tests and static analiz ##
 
-coverage: 88% of statements  
+coverage: 89.8%  
 folder "test_files" contain files for testing, do not remove/change/add if want support tests is work
+folder sample contain:
+
+1. tohex -- encode the input string to the specified encoding and return the string from the hexadecimal code of the received runes
+2. detect-all-files -- displays the encoding of all files in the current folder
+3. cpname -- work with encodinng names
 
 file linter.md report from __golangci-lint__
