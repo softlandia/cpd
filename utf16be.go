@@ -1,10 +1,32 @@
 package cpd
 
 import (
+	"bytes"
 	"encoding/binary"
+	"unicode/utf16"
+	"unicode/utf8"
 )
 
 //unit for UTF16BE
+
+// DecodeUTF16be - decode slice of byte from UTF16 to UTF8
+func DecodeUTF16be(s string) string {
+	if len(s) == 0 {
+		return ""
+	}
+	s = UTF16BE.DeleteBom(s)
+	b := []byte(s)
+	u16s := make([]uint16, 1)
+	ret := &bytes.Buffer{}
+	b8buf := make([]byte, 4)
+	for i := 0; i < len(b); i += 2 {
+		u16s[0] = uint16(b[i+1]) + (uint16(b[i]) << 8)
+		r := utf16.Decode(u16s)
+		n := utf8.EncodeRune(b8buf, r[0])
+		ret.Write(b8buf[:n])
+	}
+	return ret.String()
+}
 
 func matchUTF16be(b []byte, tbl *cpTable) MatchRes {
 	n := len(b)/2 - 1

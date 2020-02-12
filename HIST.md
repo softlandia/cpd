@@ -41,3 +41,14 @@ _____________________________
    - string UTF32 w/o bom and w/o russian char detect as UTF16
 
 _____________________________
+
+## ver 0.4.1 // 2020.02.05 ##
+
+* add function NewReader() - convertion to UTF8 with automatic detection
+* add function NewReaderCP() - convertion from UTF8 to the specified codepage
+
+### todo ###
+
+   - string UTF32 w/o bom and w/o russian char detect as UTF16
+
+_____________________________

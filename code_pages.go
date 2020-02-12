@@ -1,8 +1,10 @@
 package cpd
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
+	"io"
 	"strings"
 )
 
@@ -32,8 +34,45 @@ func (i IDCodePage) DeleteBom(s string) (res string) {
 	return res
 }
 
+// BomLen - return lenght in bytes of BOM for this
+// for codepage no have Bom, return 0
+func (i IDCodePage) BomLen() int {
+	for _, b := range Boms {
+		if b.id == i {
+			return len(b.Bom)
+		}
+	}
+	return 0
+}
+
+// ReaderHasBom - check reader to BOM prefix
+func (i IDCodePage) ReaderHasBom(r io.Reader) bool {
+	buf, err := bufio.NewReader(r).Peek(i.BomLen())
+	if err != nil {
+		return false
+	}
+	return bytes.HasPrefix(buf, codepageDic[i].Boms)
+}
+
+// DeleteBomFromReader - return reader after removing BOM from it
+func (i IDCodePage) DeleteBomFromReader(r io.Reader) io.Reader {
+	if i.ReaderHasBom(r) {
+		r.Read(make([]byte, UTF8.BomLen())) // считываем в никуда количество байт занимаемых BOM этой кодировки
+	}
+	return r
+}
+
+// codepageByName - search and return codepage id by name
+func codepageByName(name string) IDCodePage {
+	id, ok := nameMap[strings.ToLower(strings.TrimSpace(name))]
+	if !ok {
+		return ASCII
+	}
+	return id
+}
+
 // matcher - return struct MatchRes - two criterion
-// this function must be realised in each code page
+// this function must be realised in each codepage
 type matcher func(data []byte, tbl *cpTable) MatchRes
 
 // container - return true if b contain in

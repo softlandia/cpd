@@ -2,6 +2,8 @@
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
 	"os"
 	fp "path/filepath"
 	"strings"
@@ -21,15 +23,15 @@ var dStringHasBom = []tStringHasBom{
 	{0, "", false},
 	{ASCII, "", false},
 	{CP866, "CP866", false},
-	{CP1251, string([]byte{0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), false},
-	{CP1251, string([]byte{0xff, 0xfe, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), false},     // contain UTF16LE bom, false because CP1251 have no bom
-	{UTF8, string([]byte{0xef, 0xbb, 0xbf, 0xD0, 0x94, 0xD0, 0xB5, 0xD0, 0xB4}), true},  // Дед UTF8 with bom
-	{UTF8, string([]byte{0xef, 0xbb, 0xbe, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), false}, // UTF8 without bom
-	{UTF8, string([]byte{0xff, 0xbb, 0xbe, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), false}, // UTF8 without bom
-	{UTF16BE, string([]byte{0xfe, 0xff, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), true},
-	{UTF16LE, string([]byte{0xff, 0xfe, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), true},
-	{UTF32BE, string([]byte{0x00, 0x00, 0xfe, 0xff, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), true},
-	{UTF32LE, string([]byte{0xff, 0xfe, 0x00, 0x00, 0xD0, 0xEE, 0xF1, 0xF1, 0xE8, 0xFF}), true},
+	{CP1251, "\xD0\xEE\xF1\xF1\xE8\xFF", false},
+	{CP1251, "\xff\xfe\xD0\xEE\xF1\xF1\xE8\xFF", false},   // contain UTF16LE bom, false because CP1251 have no bom
+	{UTF8, "\xef\xbb\xbf\xD0\x94\xD0\xB5\xD0\xB4", true},  // Дед UTF8 with bom
+	{UTF8, "\xef\xbb\xbe\xD0\xEE\xF1\xF1\xE8\xFF", false}, // UTF8 without bom
+	{UTF8, "\xff\xbb\xbe\xD0\xEE\xF1\xF1\xE8\xFF", false}, // UTF8 without bom
+	{UTF16BE, "\xfe\xff\xD0\xEE\xF1\xF1\xE8\xFF", true},
+	{UTF16LE, "\xff\xfe\xD0\xEE\xF1\xF1\xE8\xFF", true},
+	{UTF32BE, "\x00\x00\xfe\xff\xD0\xEE\xF1\xF1\xE8\xFF", true},
+	{UTF32LE, "\xff\xfe\x00\x00\xD0\xEE\xF1\xF1\xE8\xFF", true},
 }
 
 func TestStringHasBom(t *testing.T) {
@@ -142,18 +144,17 @@ func TestFileCodePageDetectM(t *testing.T) {
 	wg.Wait()
 }
 
-//TestCodePageDetect - тестирование метода CodePageDetect
-// проверки на входные параметры:
-// 1. nil		входящий поток явный nil, параметр останова отсутствует
-// 2. nil, "~"	входящий поток явный nil, параметр останова присутствует
-// 3. входящий поток не инициализированный объект, проверка на передачу пустого интерфейса
+// TestCodePageDetect - тестирование метода CodePageDetect
+// проверки на входные параметры
 // проверка самой работы осуществляется через FileCodePageDetect()
 func TestCodePageDetect(t *testing.T) {
+	// 1. nil		входящий поток явный nil, параметр останова отсутствует
 	tmp, err := CodepageDetect(nil)
 	assert.Nil(t, err, fmt.Sprintf("<CodePageDetect> on input nil return error != nil\n"))
 	assert.Equal(t, tmp, ASCII, fmt.Sprintf("<CodePageDetect> on input nil return code page != ASCII\n"))
 
 	var data *os.File
+	// 2. nil, "~"	входящий поток явный nil, параметр останова присутствует
 	res, err := CodepageDetect(data)
 	assert.NotNil(t, err, fmt.Sprintf("<CodePageDetect> on empty io.Reader return error != nil, data: %+v, err: %v\n", data, err))
 	assert.Equal(t, res, ASCII, fmt.Sprintf("<CodePageDetect> on empty io.Reader = %+v return code page %s != ASCII\n", data, res))
@@ -246,5 +247,149 @@ func TestDecodeUtf16be(t *testing.T) {
 	for i, d := range dDecodeUTF16be {
 		s := DecodeUTF16be(d.iStr)
 		assert.Equal(t, d.oStr, s, fmt.Sprintf("test #%d not pass", i))
+	}
+}
+
+type tNewReader struct {
+	iStr   string // input string
+	oStr   string // result string
+	cpName string // codepage name
+}
+
+//здесь все тесты без ошибок
+//
+var dNewReader = []tNewReader{
+	{"\xef\xbb\xbf\xD0\x94\xD0\xB5\xD0\xB4", "Дед", ""},                // UTF8 with BOM     0
+	{"\xD0\x94\xD0\xB5\xD0\xB4", "Дед", ""},                            // UTF8 w/o BOM      1
+	{"\xFE\xFF\x04\x14\x04\x35\x04\x34", "Дед", ""},                    // UTF16be with BOM  2
+	{"\x04\x14\x04\x35\x04\x34\x00\x20\x04\x20\x04\x43", "Дед Ру", ""}, // UTF16be w/o BOM   3
+	{"\x04\x14\x04\x35\x04\x34", "Дед", "UTF-16BE"},                    // UTF16be w/o BOM   4
+	{"\xFF\xFE\x14\x04\x35\x04\x34\x04", "Дед", ""},                    // UTF16le with BOM  5
+	{"\x14\x04\x35\x04\x34\x04\x20\x00\x20\x04\x43\x04", "Дед Ру", ""}, // UTF16le w/o BOM   6
+	{"\x14\x04\x35\x04\x34\x04", "Дед", "UTF16le"},                     // UTF16le w/o BOM   7
+	{"\xD0\xEE\xF1\xF1\xE8\xFF", "Россия", ""},                         // CP1251            8
+	{"\xCE\xED\xEE", "Оно", ""},                                        // CP1251            9
+	{"\xCE\xED\xEE", "Оно", "w1251"},                                   // CP1251            10
+	{"\xCE\xED\xEE", "Оно", "win1251"},                                 // CP1251            11
+	{"1", "1", ""},                                                     // ascii string      12
+	{"1", "1", "CP866"},                                                // ascii string      13
+	{"1", "1", "CP/866"},                                               // ascii string      14
+	{"", "", "CP1251"},                                                 // ascii string      15
+	{"", "", "CP"},                                                     // ascii string      16
+	{"", "", ""},                                                       // ascii string      17
+}
+
+func TestNewReader(t *testing.T) {
+	var (
+		r   io.Reader
+		err error
+	)
+	for i, d := range dNewReader {
+		tmp := strings.NewReader(d.iStr)
+		if len(d.cpName) > 0 {
+			r, err = NewReader(tmp, d.cpName)
+		} else {
+			r, err = NewReader(tmp)
+		}
+		assert.Nil(t, err, fmt.Sprintf("test #%d not pass, NewReader() return error", i))
+		b, err := ioutil.ReadAll(r)
+		assert.Nil(t, err, fmt.Sprintf("test #%d not pass, ReadAll() return error", i))
+		assert.Equal(t, d.oStr, string(b), fmt.Sprintf("test #%d not pass", i))
+	}
+	//дополнительно тестирование nil ридера
+	r, err = NewReader(nil)
+	assert.Equal(t, err.Error(), "cpd: input reader is nil", "test NewReader(nil) return err==nil, expect: 'cpd: input reader is nil'")
+	assert.Nil(t, r, "test NewReader(nil) return r!=nil, expect: nil")
+}
+
+var dNewReaderErrors = []tNewReader{
+	{"\x00\x00\x04\x20\x00\x00\x04\x43\x00\x00\x04\x41\x00\x00\x04\x41", "cpd: codepage not support decode", "UTF-32Be"}, // UTF-32be Русс	  0
+	{"\x00\x00\x04\x20\x00\x00\x04\x43\x00\x00\x04\x41\x00\x00\x04\x41", "cpd: codepage not support decode", ""},         // UTF-32be Русс	  1
+	{"\x04\x20\x00\x00\x04\x43\x00\x00\x04\x41\x00\x00\x04\x41\x00\x00", "cpd: codepage not support decode", "UTF32le"},  // UTF-32le Русс	  2
+	{"\x04\x20\x00\x00\x04\x43\x00\x00\x04\x41\x00\x00\x04\x41\x00\x00", "cpd: codepage not support decode", ""},         // UTF-32le Русс	  3
+}
+
+// тестирование случаев с ошибкой
+func TestNewReaderError(t *testing.T) {
+	var (
+		r   io.Reader
+		err error
+	)
+	for i, d := range dNewReaderErrors {
+		tmp := strings.NewReader(d.iStr)
+		if len(d.cpName) > 0 {
+			r, err = NewReader(tmp, d.cpName)
+		} else {
+			r, err = NewReader(tmp)
+		}
+		// мы должны получить ошибку: 'cpd: codepage not support decode'
+		// кроме того вернётся поданый на вход ридер
+		assert.NotNil(t, err, fmt.Sprintf("test #%d not pass, NewReader() return nil error", i))
+		assert.Equal(t, tmp, r, fmt.Sprintf("test #%d not pass", i))
+	}
+}
+
+type tNewReaderTo struct {
+	iStr   string // input string
+	oStr   string // result string
+	cpName string // codepage name
+}
+
+var dNewReaderTo = []tNewReaderTo{
+	{"Дед", "\x84\xA5\xA4", "CP866"},                                                   // 0
+	{"Дед", "\x04\x14\x04\x35\x04\x34", "UTF16be"},                                     // 1
+	{"Дед Ру", "\x04\x14\x04\x35\x04\x34\x00\x20\x04\x20\x04\x43", "UTF-16be"},         // 2
+	{"Дед Ру", "\x14\x04\x35\x04\x34\x04\x20\x00\x20\x04\x43\x04", "UTF16Le"},          // 3
+	{"Дед", "\x14\x04\x35\x04\x34\x04", "UTF16le"},                                     // 4
+	{"Оно", "\xCE\xED\xEE", "CP-1251"},                                                 // 5
+	{"О н о", "\xCE\x20\xED\x20\xEE", "win1251"},                                       // 6
+	{"\xef\xbb\xbf\xD0\x9E\x20\xD0\xBD\x20\xD0\xBe", "\xCE\x20\xED\x20\xEE", "CP1251"}, // 7 input UTF8 with bom, convert to CP1251, BOM is expected to be deleted
+	{"\xef\xbb\xbf\xD0\x94\xD0\xB5\xD0\xB4", "Дед", "UTF8"},                            // 8 input UTF8 with bom, convert to UTF8, BOM is expected to be deleted
+	{"", "", "CP866"}, // empty input string but not empty exist codepage name  11
+}
+
+func TestNewReaderTo(t *testing.T) {
+	for i, d := range dNewReaderTo {
+		r, err := NewReaderTo(strings.NewReader(d.iStr), d.cpName)
+		assert.Nil(t, err, fmt.Sprintf("test #%d not pass, NewReaderTo() return error: '%v'", i, err))
+		b, err := ioutil.ReadAll(r)
+		assert.Nil(t, err, fmt.Sprintf("test #%d not pass, ReadAll() return error: '%v'", i, err))
+		assert.Equal(t, d.oStr, string(b), fmt.Sprintf("test #%d not pass", i))
+	}
+}
+
+// тестирование случаев с ошибкой
+var dNewReaderToError = []tNewReaderTo{
+	{"sample", "cpd: output codepage not support encode", "UTF-32"}, // 0 landing codepage not support encoding
+	{"1234", "cpd: output codepage not support encode", ""},         // 2 empty landing codepage submitted
+	{"Дед Ру", "cpd: output codepage not support encode", "cpMY"},   // 3 not exist landing codepage submitted
+	{"", "cpd: output codepage not support encode", "<CP>"},         // 4 empty input string but not empty landing codepage submitted
+	{"", "cpd: output codepage not support encode", ""},             // 5 empty input string and empty landing codepage submitted
+}
+
+func TestNewReaderToError(t *testing.T) {
+	for i, d := range dNewReaderToError {
+		_, err := NewReaderTo(strings.NewReader(d.iStr), d.cpName)
+		assert.Equal(t, d.oStr, err.Error(), fmt.Sprintf("test #%d. error expect: %s, got: %s", i, d.oStr, err.Error()))
+	}
+}
+
+type tSupportedEncoders struct {
+	cpn string // input codepage name
+	res bool   // result
+}
+
+var dSupportedEncoders = []tSupportedEncoders{
+	{"", false},        // 0
+	{"<>", false},      // 1
+	{"CP866", true},    // 2
+	{"UTF32", false},   // 3
+	{"UTF32le", false}, // 4
+}
+
+func TestSupportedEncoder(t *testing.T) {
+	for i, d := range dSupportedEncoders {
+		r := SupportedEncoder(d.cpn)
+		assert.Equal(t, d.res, r, fmt.Sprintf("test #%d not pass", i))
 	}
 }

@@ -11,6 +11,8 @@ import (
 	"github.com/softlandia/cpd"
 )
 
+//выводит кодировку всех файлов с указанным расширением
+//пример запуска: >detect-all-files .txt
 func main() {
 	var fl []string
 	FindFilesExt(&fl, ".\\", os.Args[1])

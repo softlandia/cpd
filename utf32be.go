@@ -2,7 +2,7 @@ package cpd
 
 //UTF-32BE
 
-//первые 2 байта практически всегда меньше вторых 2 байтов
+//первые 2 байта практически всегда равны 0
 func matchUTF32be(d []byte, tbl *cpTable) MatchRes {
 	zerroCounts := 0
 	for i := 0; i < len(d)-4; i += 4 {
