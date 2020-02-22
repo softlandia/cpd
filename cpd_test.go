@@ -148,17 +148,18 @@ func TestFileCodePageDetectM(t *testing.T) {
 // проверки на входные параметры
 // проверка самой работы осуществляется через FileCodePageDetect()
 func TestCodePageDetect(t *testing.T) {
-	// 1. nil		входящий поток явный nil, параметр останова отсутствует
+	// 1. nil входящий поток явный nil, параметр останова отсутствует
 	tmp, err := CodepageDetect(nil)
 	assert.Nil(t, err, fmt.Sprintf("<CodePageDetect> on input nil return error != nil\n"))
 	assert.Equal(t, tmp, ASCII, fmt.Sprintf("<CodePageDetect> on input nil return code page != ASCII\n"))
 
 	var data *os.File
-	// 2. nil, "~"	входящий поток явный nil, параметр останова присутствует
+	// 2. nil, "~"	входящий поток неинициализированный указатель, параметр останова присутствует
 	res, err := CodepageDetect(data)
 	assert.NotNil(t, err, fmt.Sprintf("<CodePageDetect> on empty io.Reader return error != nil, data: %+v, err: %v\n", data, err))
 	assert.Equal(t, res, ASCII, fmt.Sprintf("<CodePageDetect> on empty io.Reader = %+v return code page %s != ASCII\n", data, res))
 
+	// 3. входящий поток существует, но пустой
 	res, err = CodepageDetect(strings.NewReader(""))
 	assert.Nil(t, err, fmt.Sprintf("<CodePageDetect> on input \"\" return error: %v, expected nil\n", err))
 	assert.Equal(t, res, UTF8, fmt.Sprintf("<CodePageDetect> on input \"\" return %s, expected ASCII\n", res))
@@ -214,12 +215,12 @@ func TestStrConvertCodePage(t *testing.T) {
 	assert.Equal(t, s, "Россия", fmt.Sprintf("<StrConvertCodePage> '%s' wrong return from CP866 to UTF string", s))
 }
 
-type tDecodeUTF16le struct {
+type tDecodeUTF16 struct {
 	iStr string
 	oStr string
 }
 
-var dDecodeUTF16le = []tDecodeUTF16le{
+var dDecodeUTF16le = []tDecodeUTF16{
 	{"", ""}, // empty string
 	{"\xFF\xFE\x14\x04\x35\x04\x34\x04", "Дед"}, // UTF16le with BOM	1
 	{"\x14\x04\x35\x04\x34\x04", "Дед"},         // UTF16le w/o BOM		2
@@ -232,15 +233,11 @@ func TestDecodeUtf16le(t *testing.T) {
 	}
 }
 
-type tDecodeUTF16be struct {
-	iStr string
-	oStr string
-}
-
-var dDecodeUTF16be = []tDecodeUTF16le{
+var dDecodeUTF16be = []tDecodeUTF16{
 	{"", ""}, // empty string
 	{"\xFE\xFF\x04\x14\x04\x35\x04\x34", "Дед"}, // UTF16be with BOM	1
 	{"\x04\x14\x04\x35\x04\x34", "Дед"},         // UTF16be w/o BOM		2
+	//{"\x00\x14\xFF\xFF\x04\x34", "Дед"},         // UTF16be w/o BOM		3
 }
 
 func TestDecodeUtf16be(t *testing.T) {
