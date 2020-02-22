@@ -14,5 +14,4 @@ sample:
 >tohex.exe аб-ёя win1251 >r.txt
 >"\xE0\xE1\x2D\xB8\xFF"
 
-result string usefull using in golang code
-
+the result string is convenient to use in the Golang code
