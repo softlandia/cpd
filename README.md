@@ -91,9 +91,8 @@ ReadBufSize int = 1024 // default count of byte to read from input reader for de
       cpn may contain the name of the encoding of the input data, 
       we can ommit cpn, then the encoding of the input data is determined automatically
 
-    NewReaderTo(r io.Reader) io.Reader
-      encode input reader to specified enconding
-      input data ONLY in UTF-8
+    NewReaderTo(r io.Reader, cpn string) (io.Reader, error)
+      encode input reader (MUST BE UTF-8) to specified enconding
 
 ## tests and static analysis ##
 

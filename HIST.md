@@ -59,6 +59,13 @@ _____________________________
 * add tests
 * add samples
 
+_____________________________
+
+## ver 0.5.2 // 2020.07.09 ##
+
+* add license
+* add to code_pages_id.go new alias for KOI-8
+
 ### todo ###
 
    - string UTF32 w/o bom and w/o russian char detect as UTF16

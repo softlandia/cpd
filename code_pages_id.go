@@ -108,6 +108,7 @@ var nameMap = map[string]IDCodePage{
 	"cskoi8r":            KOI8R,
 	"koi":                KOI8R,
 	"koi8":               KOI8R,
+	"koi-8":              KOI8R,
 	"koi8-r":             KOI8R,
 	"koi8_r":             KOI8R,
 	"koi8-ru":            KOI8R,
