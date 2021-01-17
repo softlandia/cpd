@@ -38,7 +38,12 @@ have touble with detecting UTF32 without russians char
 
 ## types ##
 
-IDCodePage uint16 - index of code page, support String() interface, you can fmt.Printf("code page index, name: %d, %s\n", cp, cp) where var cp received from cpd functions
+IDCodePage uint16 - index of code page, support String() interface
+```
+cp := cpd.UTF8
+fmt.Printf("code page index: %d, name: %s\n", cp, cp)
+>> code page index: 106, name: UTF-8
+```
 
 ## variables ##
 
@@ -64,7 +69,6 @@ ReadBufSize int = 1024 // default count of byte to read from input reader for de
       detect code page of ascii data from reader 'r' 
       use library 'reflect' to check input reader
       default read only first 1024 byte from 'r' (var ReadBufSize to change this setting)
-      input parameter stopStr not using
 
     FileCodepageDetect(fn string, stopStr ...string) (IDCodePage, error)
       detect code page of text file "fn", read first 1024 byte (var ReadBufSize to change this setting)
@@ -72,7 +76,7 @@ ReadBufSize int = 1024 // default count of byte to read from input reader for de
       return cpd.ASCII if code page not detected
       return one of next constant (code_pages_id.go): cpd.IBM866, cpd.Windows1251, cpd.KOI8R, cpd.UTF8, UTF16LE, UTF16BE
       file must contain characters of the Rusian alphabet
-      string stopStr now not using
+      input parameter `stopStr` not using
 
     func StrConvertCodePage(s string, fromCP, toCP IDCodePage) (string, error)  
       convert string from one code page to another, support Windows1251 & IBM866
