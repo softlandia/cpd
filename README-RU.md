@@ -43,8 +43,8 @@
 IDCodePage uint16 - индекс кодовой страницы, значения взяты из файла поставки golang golang.org\x\text\encoding\internal\identifier\mib.go
 поддерживается interface String(), и можно выводить так
     cp := cpd.UTF8
-    fmt.Printf("code page index, name: %d, %s\n", cp, cp)
-    >>code page index, name: 106, UTF-8
+    fmt.Printf("code page index: %d, name: %s\n", cp, cp)
+    >> code page index: 106, name: UTF-8
 
 ## глобальные переменные ##
 

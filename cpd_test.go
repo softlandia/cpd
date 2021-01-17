@@ -1,4 +1,4 @@
-﻿package cpd
+package cpd
 
 import (
 	"fmt"
