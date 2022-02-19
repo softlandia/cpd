@@ -50,7 +50,7 @@ func testUTF8bitPattern(b byte) (int, cp int32) {
 	return 0, 0
 }
 
-//ValidUTF8 - return true if imput slice contain true UTF-8
+//ValidUTF8 - return true if input slice contain true UTF-8
 func ValidUTF8(data []byte) bool {
 	m := len(data)
 	if m <= 1 {
@@ -67,6 +67,11 @@ func ValidUTF8(data []byte) bool {
 		if n == 0 {
 			return false
 		}
+
+		if i+int(n) >= m {
+			break
+		}
+
 		i++
 		var j int32
 		for j = 1; j < n; j++ {
