@@ -1,7 +1,7 @@
 //Package cpd - code page detect
 // (c) 2020 softlandia@gmail.com
 package cpd
-
+	
 import (
 	"bufio"
 	"errors"
@@ -61,7 +61,7 @@ func CodepageAutoDetect(b []byte) IDCodePage {
 // support convert only from/to Windows1251/IBM866
 func FileConvertCodepage(fileName string, fromCP, toCP IDCodePage) error {
 	switch {
-	case (fromCP == toCP):
+	case fromCP == toCP:
 		return nil
 	case (fromCP != CP1251) && (fromCP != CP866):
 		return nil
@@ -74,7 +74,7 @@ func FileConvertCodepage(fileName string, fromCP, toCP IDCodePage) error {
 	}
 	defer iFile.Close()
 
-	//TODO need using sytem tmp folder
+	//TODO need using system tmp folder
 	tmpFileName := fileName + "~"
 	oFile, err := os.Create(tmpFileName)
 	if err != nil {
@@ -150,7 +150,7 @@ var (
 	errUnsupportedOutputCodepage = errors.New("cpd: output codepage not support encode")
 )
 
-// NewReader - convertion to UTF-8
+// NewReader - conversion to UTF-8
 // return input reader if input contain less 4 bytes
 // return input reader if input contain ASCII data
 // if cpn[0] exist, then using it as input codepage name
